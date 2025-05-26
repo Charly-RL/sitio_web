@@ -1,0 +1,8 @@
+/* admin.css - Estilos personalizados para el panel de administración */
+.admin-container {
+    padding: 2rem 0;
+}
+.table img {
+    max-width: 50px;
+    height: auto;
+}

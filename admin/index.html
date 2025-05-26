@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Mi Tienda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .admin-container {
+            padding: 2rem 0;
+        }
+        .table img {
+            max-width: 50px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Mi Tienda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Panel Admin</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container admin-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Productos</h2>
+            <!-- Botón para nuevo producto -->
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProductModal">
+                <i class="bi bi-plus-lg"></i> Nuevo Producto
+            </button>
+        </div>
+
+        <!-- Tabla de Productos -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Nuevo Producto -->
+    <div class="modal fade" id="newProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newProductForm">
+                        <div class="mb-3">
+                            <label for="newNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="newNombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDescripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="newDescripcion" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPrecio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="newPrecio" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newStock" class="form-label">Stock</label>
+                            <input type="number" class="form-control" id="newStock" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newImagen" class="form-label">URL de la Imagen</label>
+                            <input type="url" class="form-control" id="newImagen" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveNewProduct">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Producto -->
+    <div class="modal fade" id="editProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm">
+                        <input type="hidden" id="editProductId">
+                        <div class="mb-3">
+                            <label for="editNombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="editDescripcion" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPrecio" class="form-label">Precio</label>
+                            <input type="number" class="form-control" id="editPrecio" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStock" class="form-label">Stock</label>
+                            <input type="number" class="form-control" id="editStock" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editImagen" class="form-label">URL de la Imagen</label>
+                            <input type="url" class="form-control" id="editImagen" placeholder="https://ejemplo.com/imagen.jpg">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEditProduct">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Verificar si el usuario es administrador
+        $.get('../api/auth.php?accion=verificar', function(response) {
+            if (!response.autenticado || !response.es_admin) {
+                window.location.href = '../auth/login.html';
+            }
+        });
+
+        // Cargar productos
+        function loadProducts() {
+            $.get('../api/productos.php', function(response) {
+                const tableBody = $('#productTableBody');
+                tableBody.empty();
+
+                response.productos.forEach(product => {
+                    const row = `
+                        <tr>
+                            <td>${product.id}</td>
+                            <td> Aqui va imagen </td>
+                            <td>${product.nombre}</td>
+                            <td>${product.descripcion || ''}</td>
+                            <td>$${product.precio}</td>
+                            <td>${product.stock}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary editar" onclick="editProduct(${product.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            });
+        }
+
+        // Guardar nuevo producto
+        $('#saveNewProduct').click(function() {
+            const productData = {
+                nombre: $('#newNombre').val(),
+                descripcion: $('#newDescripcion').val(),
+                precio: parseFloat($('#newPrecio').val()),
+                stock: parseInt($('#newStock').val()),
+                imagen: $('#newImagen').val()
+            };
+            $.ajax({
+                url: '../api/productos.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(productData),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Producto creado correctamente');
+                        $('#newProductModal').modal('hide');
+                        loadProducts();
+                        $('#newProductForm')[0].reset();
+                    } else {
+                        alert(response.error || 'Error al guardar el producto');
+                    }
+                },
+                error: function() {
+                    alert('Error al guardar el producto');
+                }
+            });
+        });
+
+        // Editar producto
+        window.editProduct = function(id) {
+            $.get(`../api/productos.php?id=${id}`, function(response) {
+                const product = response.productos[0];
+                $('#editProductId').val(product.id);
+                $('#editNombre').val(product.nombre);
+                $('#editDescripcion').val(product.descripcion);
+                $('#editPrecio').val(product.precio);
+                $('#editStock').val(product.stock);
+                $('#editImagen').val(product.imagen);
+                $('#editProductModal').modal('show');
+            });
+        }
+
+        // Guardar cambios de edición
+        $('#saveEditProduct').click(function() {
+            const id = $('#editProductId').val();
+            const productData = {
+                nombre: $('#editNombre').val(),
+                descripcion: $('#editDescripcion').val(),
+                precio: parseFloat($('#editPrecio').val()),
+                stock: parseInt($('#editStock').val()),
+                imagen: $('#editImagen').val()
+            };
+            $.ajax({
+                url: `../api/productos.php?id=${id}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(productData),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Producto actualizado correctamente');
+                        $('#editProductModal').modal('hide');
+                        loadProducts();
+                    } else {
+                        alert(response.error || 'Error al guardar el producto');
+                    }
+                },
+                error: function() {
+                    alert('Error al guardar el producto');
+                }
+            });
+        });
+
+        // Eliminar producto
+        window.deleteProduct = function(id) {
+            if (confirm('¿Está seguro de que desea eliminar este producto?')) {
+                $.ajax({
+                    url: `../api/productos.php?id=${id}`,
+                    type: 'DELETE',
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Producto eliminado correctamente');
+                            loadProducts();
+                        } else {
+                            alert(response.error || 'Error al eliminar el producto');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Cerrar sesión
+        $('#logoutBtn').click(function() {
+            $.get('../api/auth.php?accion=logout', function(response) {
+                if (response.success) {
+                    window.location.href = '../auth/login.html';
+                }
+            });
+        });
+
+        // Inicialización
+        loadProducts();
+    });
+    </script>
+</body>
+</html>

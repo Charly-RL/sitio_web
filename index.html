@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('img/fondo.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+        }
+        .product-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .cart-badge {
+            position: relative;
+            top: -8px;
+            right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Botanas Kiky</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#productos">Productos</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" id="adminMenuItem" style="display: none;">
+                        <a class="nav-link" href="admin/index.html">Panel Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
+                            <i class="bi bi-cart3"></i>
+                            <span class="badge bg-danger cart-badge" id="cartCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="authButtons">
+                        <a class="nav-link" href="auth/login.html">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item" id="userMenu" style="display: none;">
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i>
+                                <span id="userName"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" id="logoutBtn">Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero text-center">
+        <div class="container">
+            <h1 class="display-4">Bienvenido a Botanas Kiky</h1>
+            <p class="lead">Descubre nuestra selección de botanas</p>
+            <a href="#productos" class="btn btn-primary btn-lg">Ver Productos</a>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <section id="productos" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Nuestros Productos</h2>
+            <div class="row g-4" id="productList">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Carrito de Compras</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cartEmpty" class="text-center py-4">
+                        <i class="bi bi-cart3 fs-1"></i>
+                        <p class="mt-3">Tu carrito está vacío</p>
+                    </div>
+                    <div id="cartItems" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th>Subtotal</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartItemsList"></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <h4>Total: $<span id="cartTotal">0.00</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="checkoutBtn">Realizar Pedido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Botanas Kiky</h5>
+                    <p>un gusto a tu antojo</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Contacto</h5>
+                    <p>Email: contacto@botanaskiky.com</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        let cart = [];
+        let isAuthenticated = false;
+        let isAdmin = false;
+
+        // Verificar autenticación
+        function checkAuth() {
+            $.get('api/auth.php?accion=verificar', function(response) {
+                isAuthenticated = response.autenticado;
+                isAdmin = response.es_admin;
+                updateAuthUI();
+            });
+        }
+
+        // Actualizar UI según autenticación
+        function updateAuthUI() {
+            if (isAuthenticated) {
+                $('#authButtons').hide();
+                $('#userMenu').show();
+                $('#userName').text(localStorage.getItem('userName'));
+                if (isAdmin) {
+                    $('#adminMenuItem').show();
+                }
+            } else {
+                $('#authButtons').show();
+                $('#userMenu').hide();
+                $('#adminMenuItem').hide();
+            }
+        }
+
+        // Cargar productos
+        function loadProducts() {
+            $.get('api/productos.php', function(response) {
+                const productList = $('#productList');
+                productList.empty();
+
+                response.productos.forEach(product => {
+                    const card = `
+                        <div class="col-md-4 col-lg-3">
+                            <div class="card product-card">
+                                <img src="${product.imagen || 'https://via.placeholder.com/300'}" class="card-img-top" alt="${product.nombre}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.nombre}</h5>
+                                    <p class="card-text">${product.descripcion || ''}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 mb-0">$${product.precio}</span>
+                                        <button class="btn btn-primary btn-sm" onclick="addToCart(${product.id}, '${product.nombre}', ${product.precio})"
+                                                ${product.stock > 0 ? '' : 'disabled'}>                                            
+                                            ${product.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productList.append(card);
+                });
+            });
+        }
+
+        // Agregar al carrito
+        window.addToCart = function(id, nombre, precio) {
+            if (!isAuthenticated) {
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.cantidad++;
+            } else {
+                cart.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: 1
+                });
+            }
+            updateCart();
+        }
+
+        // Actualizar carrito
+        function updateCart() {
+            const cartCount = cart.reduce((total, item) => total + item.cantidad, 0);
+            $('#cartCount').text(cartCount);
+
+            if (cart.length === 0) {
+                $('#cartEmpty').show();
+                $('#cartItems').hide();
+                $('#checkoutBtn').prop('disabled', true);
+                return;
+            }
+
+            $('#cartEmpty').hide();
+            $('#cartItems').show();
+            $('#checkoutBtn').prop('disabled', false);
+
+            const cartList = $('#cartItemsList');
+            cartList.empty();
+            let total = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                const row = `
+                    <tr>
+                        <td>${item.nombre}</td>
+                        <td>$${item.precio}</td>
+                        <td>
+                            <div class="input-group input-group-sm" style="width: 100px;">
+                                <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
+                                <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.id}, 1)">+</button>
+                            </div>
+                        </td>
+                        <td>$${subtotal.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removeFromCart(${item.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                cartList.append(row);
+            });
+
+            $('#cartTotal').text(total.toFixed(2));
+        }
+
+        // Actualizar cantidad
+        window.updateQuantity = function(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.cantidad = Math.max(1, item.cantidad + change);
+                updateCart();
+            }
+        }
+
+        // Eliminar del carrito
+        window.removeFromCart = function(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        // Realizar pedido
+        $('#checkoutBtn').click(function() {
+            if (!isAuthenticated) {
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            $.ajax({
+                url: 'api/carrito.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ productos: cart }),
+                success: function(response) {
+                    if (response.success) {
+                        alert('¡Pedido realizado con éxito!');
+                        cart = [];
+                        updateCart();
+                        $('#cartModal').modal('hide');
+                    } else {
+                        alert(response.error || 'Error al procesar el pedido');
+                    }
+                },
+                error: function() {
+                    alert('Error al procesar el pedido');
+                }
+            });
+        });
+
+        // Cerrar sesión
+        $('#logoutBtn').click(function() {
+            $.get('api/auth.php?accion=logout', function(response) {
+                if (response.success) {
+                    localStorage.removeItem('userName');
+                    cart = [];
+                    updateCart();
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        // Inicialización
+        checkAuth();
+        loadProducts();
+        updateCart();
+
+    });
+    </script>
+</body>
+</html>

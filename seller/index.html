@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Vendedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Mi Tienda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Vendedor</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Seller Dashboard -->
+    <div class="container my-5">
+        <h2>Panel de Vendedor</h2>
+        
+        <!-- Sales Form -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3>Nueva Venta</h3>
+                <form>
+                    <div class="mb-3">
+                        <label for="cliente" class="form-label">Cliente</label>
+                        <input type="text" class="form-control" id="cliente" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="producto" class="form-label">Producto</label>
+                        <select class="form-select" id="producto" required>
+                            <option value="">Seleccionar producto</option>
+                            <option value="1">Producto 1</option>
+                            <option value="2">Producto 2</option>
+                            <option value="3">Producto 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="cantidad" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrar Venta</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sales History -->
+        <div class="mt-5">
+            <h3>Historial de Ventas</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Juan Pérez</td>
+                        <td>Producto 1</td>
+                        <td>2</td>
+                        <td>$199.98</td>
+                        <td>2023-07-20</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

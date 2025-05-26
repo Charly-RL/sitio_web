@@ -155,7 +155,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     $(document).ready(function() {
-        let cart = [];
         let isAuthenticated = false;
         let isAdmin = false;
 
@@ -194,7 +193,7 @@
                     const card = `
                         <div class="col-md-4 col-lg-3">
                             <div class="card product-card">
-                                <img src="${product.imagen || 'https://via.placeholder.com/300'}" class="card-img-top" alt="${product.nombre}">
+                                <img src="${product.imagen}" class="card-img-top" alt="${product.nombre}">
                                 <div class="card-body">
                                     <h5 class="card-title">${product.nombre}</h5>
                                     <p class="card-text">${product.descripcion || ''}</p>
@@ -212,94 +211,8 @@
                     productList.append(card);
                 });
             });
-        }
-
-        // Agregar al carrito
+        }        // Agregar al carrito
         window.addToCart = function(id, nombre, precio) {
-            if (!isAuthenticated) {
-                window.location.href = 'auth/login.html';
-                return;
-            }
-
-            const existingItem = cart.find(item => item.id === id);
-            if (existingItem) {
-                existingItem.cantidad++;
-            } else {
-                cart.push({
-                    id: id,
-                    nombre: nombre,
-                    precio: precio,
-                    cantidad: 1
-                });
-            }
-            updateCart();
-        }
-
-        // Actualizar carrito
-        function updateCart() {
-            const cartCount = cart.reduce((total, item) => total + item.cantidad, 0);
-            $('#cartCount').text(cartCount);
-
-            if (cart.length === 0) {
-                $('#cartEmpty').show();
-                $('#cartItems').hide();
-                $('#checkoutBtn').prop('disabled', true);
-                return;
-            }
-
-            $('#cartEmpty').hide();
-            $('#cartItems').show();
-            $('#checkoutBtn').prop('disabled', false);
-
-            const cartList = $('#cartItemsList');
-            cartList.empty();
-            let total = 0;
-
-            cart.forEach(item => {
-                const subtotal = item.precio * item.cantidad;
-                total += subtotal;
-                const row = `
-                    <tr>
-                        <td>${item.nombre}</td>
-                        <td>$${item.precio}</td>
-                        <td>
-                            <div class="input-group input-group-sm" style="width: 100px;">
-                                <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.id}, -1)">-</button>
-                                <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
-                                <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.id}, 1)">+</button>
-                            </div>
-                        </td>
-                        <td>$${subtotal.toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" onclick="removeFromCart(${item.id})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                cartList.append(row);
-            });
-
-            $('#cartTotal').text(total.toFixed(2));
-        }
-
-        // Actualizar cantidad
-        window.updateQuantity = function(id, change) {
-            const item = cart.find(item => item.id === id);
-            if (item) {
-                item.cantidad = Math.max(1, item.cantidad + change);
-                updateCart();
-            }
-        }
-
-        // Eliminar del carrito
-        window.removeFromCart = function(id) {
-            cart = cart.filter(item => item.id !== id);
-            updateCart();
-        }
-
-        // Realizar pedido
-        $('#checkoutBtn').click(function() {
             if (!isAuthenticated) {
                 window.location.href = 'auth/login.html';
                 return;
@@ -309,20 +222,158 @@
                 url: 'api/carrito.php',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ productos: cart }),
+                data: JSON.stringify({
+                    producto_id: id,
+                    cantidad: 1
+                }),
                 success: function(response) {
-                    if (response.success) {
-                        alert('¡Pedido realizado con éxito!');
-                        cart = [];
-                        updateCart();
-                        $('#cartModal').modal('hide');
+                    if (response.mensaje) {
+                        loadCart();
                     } else {
-                        alert(response.error || 'Error al procesar el pedido');
+                        alert(response.error || 'Error al agregar al carrito');
                     }
                 },
                 error: function() {
-                    alert('Error al procesar el pedido');
+                    alert('Error al agregar al carrito');
                 }
+            });
+        }        // Cargar carrito desde el servidor
+        function loadCart() {
+            $.get('api/carrito.php', function(response) {
+                const cartItems = response.carrito || [];
+                const cartCount = cartItems.reduce((total, item) => total + parseInt(item.cantidad), 0);
+                $('#cartCount').text(cartCount);
+
+                if (cartItems.length === 0) {
+                    $('#cartEmpty').show();
+                    $('#cartItems').hide();
+                    $('#checkoutBtn').prop('disabled', true);
+                    return;
+                }
+
+                $('#cartEmpty').hide();
+                $('#cartItems').show();
+                $('#checkoutBtn').prop('disabled', false);
+
+                const cartList = $('#cartItemsList');
+                cartList.empty();
+                let total = 0;
+
+                cartItems.forEach(item => {
+                    const subtotal = item.precio * item.cantidad;
+                    total += subtotal;
+                    const row = `
+                        <tr>
+                            <td>${item.nombre}</td>
+                            <td>$${item.precio}</td>
+                            <td>    <div class="input-group input-group-sm" style="width: 100px;">
+                                    <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.producto_id}, ${item.cantidad - 1})">-</button>
+                                    <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
+                                    <button class="btn btn-outline-secondary" onclick="updateQuantity(${item.producto_id}, ${item.cantidad + 1})">+</button>
+                                </div>
+                            </td>
+                            <td>$${subtotal.toFixed(2)}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromCart(${item.producto_id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    cartList.append(row);
+                });
+
+                $('#cartTotal').text(total.toFixed(2));
+            });
+        }        // Actualizar cantidad
+        window.updateQuantity = function(id, newCantidad) {
+            $.ajax({
+                url: 'api/carrito.php',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    producto_id: id,
+                    cantidad: newCantidad
+                }),
+                success: function(response) {
+                    if (response.mensaje) {
+                        loadCart();
+                    } else {
+                        alert(response.error || 'Error al actualizar el carrito');
+                    }
+                },
+                error: function() {
+                    alert('Error al actualizar el carrito');
+                }
+            });
+        }
+
+        // Eliminar del carrito
+        window.removeFromCart = function(id) {
+            $.ajax({
+                url: 'api/carrito.php',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    producto_id: id
+                }),
+                success: function(response) {
+                    if (response.mensaje) {
+                        loadCart();
+                    } else {
+                        alert(response.error || 'Error al eliminar del carrito');
+                    }
+                },
+                error: function() {
+                    alert('Error al eliminar del carrito');
+                }
+            });
+        }        // Realizar pedido
+        $('#checkoutBtn').click(function() {
+            if (!isAuthenticated) {
+                window.location.href = 'auth/login.html';
+                return;
+            }
+
+            $.get('api/carrito.php', function(response) {
+                const cartItems = response.carrito || [];
+                if (cartItems.length === 0) {
+                    alert('El carrito está vacío');
+                    return;
+                }
+
+                const pedido = {
+                    productos: cartItems.map(item => ({
+                        id: item.producto_id,
+                        cantidad: item.cantidad
+                    }))
+                };
+
+                $.ajax({
+                    url: 'api/pedidos.php',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(pedido),
+                    success: function(response) {
+                        if (response.success) {
+                            alert('¡Pedido realizado con éxito!');
+                            // Limpiar carrito después de crear el pedido
+                            $.ajax({
+                                url: 'api/carrito.php',
+                                type: 'DELETE',
+                                success: function() {
+                                    loadCart();
+                                    $('#cartModal').modal('hide');
+                                }
+                            });
+                        } else {
+                            alert(response.error || 'Error al procesar el pedido');
+                        }
+                    },
+                    error: function() {
+                        alert('Error al procesar el pedido');
+                    }
+                });
             });
         });
 
@@ -336,12 +387,10 @@
                     window.location.href = 'index.html';
                 }
             });
-        });
-
-        // Inicialización
+        });        // Inicialización
         checkAuth();
         loadProducts();
-        updateCart();
+        loadCart();
 
     });
     </script>

@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/auth.php';
 
 // Verificar si el usuario está autenticado
 if (!estaAutenticado()) {
+    http_response_code(401);
     echo json_encode(['error' => 'Usuario no autenticado']);
     exit;
 }
@@ -19,7 +20,130 @@ $metodo = $_SERVER['REQUEST_METHOD'];
 $data = json_decode(file_get_contents('php://input'), true);
 
 switch ($metodo) {
+    case 'GET':
+        // Obtener productos en el carrito del usuario
+        $sql = "SELECT c.*, p.nombre, p.precio, p.stock, p.imagen 
+                FROM carrito c 
+                JOIN productos p ON c.producto_id = p.id 
+                WHERE c.usuario_id = ?";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("i", $usuario_id);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        
+        $carrito = [];
+        while ($row = $resultado->fetch_assoc()) {
+            $carrito[] = $row;
+        }
+        
+        echo json_encode(['carrito' => $carrito]);
+        break;
+
     case 'POST':
+        // Agregar producto al carrito
+        if (!isset($data['producto_id']) || !isset($data['cantidad'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Datos incompletos']);
+            exit;
+        }
+
+        // Verificar stock disponible
+        $stmt = $conexion->prepare("SELECT stock FROM productos WHERE id = ?");
+        $stmt->bind_param("i", $data['producto_id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $producto = $result->fetch_assoc();
+
+        if (!$producto) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Producto no encontrado']);
+            exit;
+        }
+
+        if ($producto['stock'] < $data['cantidad']) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Stock insuficiente']);
+            exit;
+        }
+
+        // Intentar insertar o actualizar el carrito
+        $sql = "INSERT INTO carrito (usuario_id, producto_id, cantidad) 
+                VALUES (?, ?, ?) 
+                ON DUPLICATE KEY UPDATE cantidad = cantidad + VALUES(cantidad)";
+        
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("iii", $usuario_id, $data['producto_id'], $data['cantidad']);
+        
+        if ($stmt->execute()) {
+            echo json_encode(['mensaje' => 'Producto agregado al carrito']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al agregar al carrito']);
+        }
+        break;
+
+    case 'PUT':
+        // Actualizar cantidad de un producto en el carrito
+        if (!isset($data['producto_id']) || !isset($data['cantidad'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Datos incompletos']);
+            exit;
+        }
+
+        if ($data['cantidad'] <= 0) {
+            // Si la cantidad es 0 o negativa, eliminar del carrito
+            $sql = "DELETE FROM carrito WHERE usuario_id = ? AND producto_id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("ii", $usuario_id, $data['producto_id']);
+        } else {
+            // Verificar stock disponible
+            $stmt = $conexion->prepare("SELECT stock FROM productos WHERE id = ?");
+            $stmt->bind_param("i", $data['producto_id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $producto = $result->fetch_assoc();
+
+            if ($producto['stock'] < $data['cantidad']) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Stock insuficiente']);
+                exit;
+            }
+
+            // Actualizar cantidad
+            $sql = "UPDATE carrito SET cantidad = ? WHERE usuario_id = ? AND producto_id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("iii", $data['cantidad'], $usuario_id, $data['producto_id']);
+        }
+        
+        if ($stmt->execute()) {
+            echo json_encode(['mensaje' => 'Carrito actualizado']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al actualizar el carrito']);
+        }
+        break;
+
+    case 'DELETE':
+        // Eliminar un producto del carrito o todo el carrito
+        if (isset($data['producto_id'])) {
+            // Eliminar un producto específico
+            $sql = "DELETE FROM carrito WHERE usuario_id = ? AND producto_id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("ii", $usuario_id, $data['producto_id']);
+        } else {
+            // Eliminar todo el carrito del usuario
+            $sql = "DELETE FROM carrito WHERE usuario_id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param("i", $usuario_id);
+        }
+        
+        if ($stmt->execute()) {
+            echo json_encode(['mensaje' => 'Producto(s) eliminado(s) del carrito']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al eliminar del carrito']);
+        }
+        break;
         // Crear nuevo pedido
         if (!isset($data['productos']) || empty($data['productos'])) {
             echo json_encode(['error' => 'No hay productos en el carrito']);

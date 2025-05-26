@@ -116,6 +116,8 @@
                             $.get('../api/auth.php?accion=verificar', function(resp) {
                                 if (resp.tipo === 'admin') {
                                     window.location.href = '../admin/index.html';
+                                }else if(resp.tipo === 'vendedor') {
+                                    window.location.href = '../vendedor/index.html';
                                 } else {
                                     window.location.href = '../index.html';
                                 }

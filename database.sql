@@ -45,7 +45,17 @@ CREATE TABLE detalles_pedido (
     FOREIGN KEY (producto_id) REFERENCES productos(id)
 );
 
-
+-- Tabla de carrito
+CREATE TABLE carrito (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    fecha_agregado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (producto_id) REFERENCES productos(id),
+    UNIQUE KEY carrito_usuario_producto (usuario_id, producto_id)
+);
 
 -- Insertar un usuario administrador por defecto
 INSERT INTO usuarios (nombre, email, password, tipo) VALUES

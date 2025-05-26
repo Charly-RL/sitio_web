@@ -1,8 +1,8 @@
 <?php
 // Configuración de la base de datos
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', 'mysql');
+define('DB_USER', 'admin');
+define('DB_PASS', 'admin');
 define('DB_NAME', 'tienda_online');
 
 // Crear conexión

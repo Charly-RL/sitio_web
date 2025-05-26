@@ -6,13 +6,29 @@
     <title>Panel de Administración - Mi Tienda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="js/admin.css">
     <style>
-        .admin-container {
-            padding: 2rem 0;
+        .sidebar-admin {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 250px;
+            height: 100vh;
+            z-index: 1040;
+            transition: left 0.3s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         }
-        .table img {
-            max-width: 50px;
-            height: auto;
+        .sidebar-admin.show {
+            left: 0;
+        }
+        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        @media (max-width: 991.98px) {
+            .sidebar-admin {
+                width: 80vw;
+                min-width: 180px;
+            }
         }
     </style>
 </head>
@@ -20,6 +36,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
+            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
+                <i class="bi bi-list"></i>
+            </button>
             <a class="navbar-brand" href="../index.html">Mi Tienda</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -41,6 +60,28 @@
             </div>
         </div>
     </nav>
+
+    <!-- Sidebar -->
+    <div id="adminSidebar" class="sidebar-admin bg-dark text-white">
+        <div class="sidebar-header d-flex justify-content-between align-items-center p-3 border-bottom">
+            <span class="fw-bold">Administración</span>
+            <button class="btn btn-sm btn-close btn-close-white" id="sidebarClose" aria-label="Cerrar"></button>
+        </div>
+        <ul class="nav flex-column p-3">
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="index.html"><i class="bi bi-box-seam me-2"></i>Productos</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="usuarios.html"><i class="bi bi-people me-2"></i>Usuarios</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="reportes.html"><i class="bi bi-bar-chart me-2"></i>Reportes</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="configuracion.html"><i class="bi bi-gear me-2"></i>Configuración</a>
+            </li>
+        </ul>
+    </div>
 
     <div class="container admin-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -156,148 +197,31 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin.js"></script>
     <script>
-    $(document).ready(function() {
-        // Verificar si el usuario es administrador
-        $.get('../api/auth.php?accion=verificar', function(response) {
-            if (!response.autenticado || !response.es_admin) {
-                window.location.href = '../auth/login.html';
+    // Sidebar toggle logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('adminSidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('show');
+            });
+        }
+        if (sidebarClose && sidebar) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+            });
+        }
+        // Cerrar sidebar al hacer click fuera (opcional)
+        document.addEventListener('click', function(e) {
+            if (sidebar.classList.contains('show')) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
             }
         });
-
-        // Cargar productos
-        function loadProducts() {
-            $.get('../api/productos.php', function(response) {
-                const tableBody = $('#productTableBody');
-                tableBody.empty();
-
-                response.productos.forEach(product => {
-                    const row = `
-                        <tr>
-                            <td>${product.id}</td>
-                            <td> Aqui va imagen </td>
-                            <td>${product.nombre}</td>
-                            <td>${product.descripcion || ''}</td>
-                            <td>$${product.precio}</td>
-                            <td>${product.stock}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary editar" onclick="editProduct(${product.id})">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.append(row);
-                });
-            });
-        }
-
-        // Guardar nuevo producto
-        $('#saveNewProduct').click(function() {
-            const productData = {
-                nombre: $('#newNombre').val(),
-                descripcion: $('#newDescripcion').val(),
-                precio: parseFloat($('#newPrecio').val()),
-                stock: parseInt($('#newStock').val()),
-                imagen: $('#newImagen').val()
-            };
-            $.ajax({
-                url: '../api/productos.php',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(productData),
-                success: function(response) {
-                    if (response.success) {
-                        alert('Producto creado correctamente');
-                        $('#newProductModal').modal('hide');
-                        loadProducts();
-                        $('#newProductForm')[0].reset();
-                    } else {
-                        alert(response.error || 'Error al guardar el producto');
-                    }
-                },
-                error: function() {
-                    alert('Error al guardar el producto');
-                }
-            });
-        });
-
-        // Editar producto
-        window.editProduct = function(id) {
-            $.get(`../api/productos.php?id=${id}`, function(response) {
-                const product = response.productos[0];
-                $('#editProductId').val(product.id);
-                $('#editNombre').val(product.nombre);
-                $('#editDescripcion').val(product.descripcion);
-                $('#editPrecio').val(product.precio);
-                $('#editStock').val(product.stock);
-                $('#editImagen').val(product.imagen);
-                $('#editProductModal').modal('show');
-            });
-        }
-
-        // Guardar cambios de edición
-        $('#saveEditProduct').click(function() {
-            const id = $('#editProductId').val();
-            const productData = {
-                nombre: $('#editNombre').val(),
-                descripcion: $('#editDescripcion').val(),
-                precio: parseFloat($('#editPrecio').val()),
-                stock: parseInt($('#editStock').val()),
-                imagen: $('#editImagen').val()
-            };
-            $.ajax({
-                url: `../api/productos.php?id=${id}`,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(productData),
-                success: function(response) {
-                    if (response.success) {
-                        alert('Producto actualizado correctamente');
-                        $('#editProductModal').modal('hide');
-                        loadProducts();
-                    } else {
-                        alert(response.error || 'Error al guardar el producto');
-                    }
-                },
-                error: function() {
-                    alert('Error al guardar el producto');
-                }
-            });
-        });
-
-        // Eliminar producto
-        window.deleteProduct = function(id) {
-            if (confirm('¿Está seguro de que desea eliminar este producto?')) {
-                $.ajax({
-                    url: `../api/productos.php?id=${id}`,
-                    type: 'DELETE',
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Producto eliminado correctamente');
-                            loadProducts();
-                        } else {
-                            alert(response.error || 'Error al eliminar el producto');
-                        }
-                    }
-                });
-            }
-        }
-
-        // Cerrar sesión
-        $('#logoutBtn').click(function() {
-            $.get('../api/auth.php?accion=logout', function(response) {
-                if (response.success) {
-                    window.location.href = '../auth/login.html';
-                }
-            });
-        });
-
-        // Inicialización
-        loadProducts();
     });
     </script>
 </body>

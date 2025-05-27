@@ -382,8 +382,6 @@
             $.get('api/auth.php?accion=logout', function(response) {
                 if (response.success) {
                     localStorage.removeItem('userName');
-                    cart = [];
-                    updateCart();
                     window.location.href = 'index.html';
                 }
             });

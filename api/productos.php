@@ -25,14 +25,25 @@ switch ($metodo) {
         } else {
             $sql = "SELECT * FROM productos";
         }
-        
+
         $resultado = $conexion->query($sql);
         $productos = [];
-        
+
         while ($row = $resultado->fetch_assoc()) {
+            // Calcular estado de stock
+            $stock = (int)$row['stock'];
+            if ($stock <= 2) {
+                $row['stock_estado'] = 'Crítico';
+            } elseif ($stock <= 5) {
+                $row['stock_estado'] = 'Bajo';
+            } elseif ($stock <= 15) {
+                $row['stock_estado'] = 'Normal';
+            } else {
+                $row['stock_estado'] = 'Abundante';
+            }
             $productos[] = $row;
         }
-        
+
         echo json_encode(['productos' => $productos]);
         break;
         

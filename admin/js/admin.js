@@ -14,6 +14,12 @@ $(document).ready(function() {
             tableBody.empty();
 
             response.productos.forEach(product => {
+                let badge = '';
+                if (product.stock_estado === 'Crítico') badge = '<span class="badge bg-danger">Crítico</span>';
+                else if (product.stock_estado === 'Bajo') badge = '<span class="badge bg-warning text-dark">Bajo</span>';
+                else if (product.stock_estado === 'Normal') badge = '<span class="badge bg-info text-dark">Normal</span>';
+                else badge = '<span class="badge bg-success">Abundante</span>';
+
                 const row = `
                     <tr>
                         <td>${product.id}</td>
@@ -21,7 +27,7 @@ $(document).ready(function() {
                         <td>${product.nombre}</td>
                         <td>${product.descripcion || ''}</td>
                         <td>$${product.precio}</td>
-                        <td>${product.stock}</td>
+                        <td>${product.stock} ${badge}</td>
                         <td>
                             <button class="btn btn-sm btn-primary editar" onclick="editProduct(${product.id})">
                                 <i class="bi bi-pencil"></i>

@@ -8,7 +8,7 @@ CREATE TABLE usuarios (
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    tipo ENUM('admin', 'cliente') DEFAULT 'cliente',
+    tipo ENUM('admin', 'cliente', 'vendedor') DEFAULT 'cliente',
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

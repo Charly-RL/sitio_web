@@ -62,6 +62,11 @@ function esAdmin() {
     return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin';
 }
 
+// Función para verificar si el usuario es vendedor
+function esVendedor() {
+    return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'vendedor';
+}
+
 // Función para cerrar sesión
 function logout() {
     session_unset();

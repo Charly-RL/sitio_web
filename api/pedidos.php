@@ -91,6 +91,7 @@ switch ($metodo) {
         break;
 
     case 'GET':
+
         // Endpoint para productos más vendidos
         if (isset($_GET['accion']) && $_GET['accion'] === 'masvendidos') {
             $sql = "SELECT p.id, p.nombre, SUM(dp.cantidad) as cantidad_vendida
@@ -105,6 +106,56 @@ switch ($metodo) {
                 $productos[] = $row;
             }
             echo json_encode(['productos' => $productos]);
+            break;
+        }
+
+        // Endpoint para estadísticas generales y ventas por semana/día
+        if (isset($_GET['accion']) && $_GET['accion'] === 'estadisticas') {
+            // Total ventas y pedidos
+            $sql = "SELECT COUNT(*) as total_pedidos, IFNULL(SUM(total),0) as total_ventas FROM pedidos";
+            $result = $conexion->query($sql);
+            $row = $result->fetch_assoc();
+            $total_pedidos = (int)$row['total_pedidos'];
+            $total_ventas = (float)$row['total_ventas'];
+
+            // Ventas por día (últimos 7 días)
+            $sql = "SELECT DATE(fecha_pedido) as dia, IFNULL(SUM(total),0) as total
+                    FROM pedidos
+                    WHERE fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                    GROUP BY dia
+                    ORDER BY dia ASC";
+            $result = $conexion->query($sql);
+            $ventas_por_dia = [];
+            while ($row = $result->fetch_assoc()) {
+                $ventas_por_dia[] = [
+                    'dia' => $row['dia'],
+                    'total' => $row['total']
+                ];
+            }
+
+            // Ventas por semana (últimas 4 semanas)
+            $sql = "SELECT YEARWEEK(fecha_pedido, 1) as semana, MIN(DATE(fecha_pedido)) as inicio_semana, IFNULL(SUM(total),0) as total
+                    FROM pedidos
+                    WHERE fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
+                    GROUP BY semana
+                    ORDER BY semana ASC";
+            $result = $conexion->query($sql);
+            $ventas_por_semana = [];
+            while ($row = $result->fetch_assoc()) {
+                $ventas_por_semana[] = [
+                    'semana' => $row['semana'],
+                    'inicio_semana' => $row['inicio_semana'],
+                    'total' => $row['total']
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'total_pedidos' => $total_pedidos,
+                'total_ventas' => $total_ventas,
+                'ventas_por_dia' => $ventas_por_dia,
+                'ventas_por_semana' => $ventas_por_semana
+            ]);
             break;
         }
 

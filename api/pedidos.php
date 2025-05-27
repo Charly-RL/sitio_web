@@ -91,7 +91,24 @@ switch ($metodo) {
         break;
 
     case 'GET':
-        // Obtener pedidos del usuario
+        // Endpoint para productos más vendidos
+        if (isset($_GET['accion']) && $_GET['accion'] === 'masvendidos') {
+            $sql = "SELECT p.id, p.nombre, SUM(dp.cantidad) as cantidad_vendida
+                    FROM productos p
+                    JOIN detalles_pedido dp ON p.id = dp.producto_id
+                    GROUP BY p.id, p.nombre
+                    ORDER BY cantidad_vendida DESC
+                    LIMIT 10";
+            $result = $conexion->query($sql);
+            $productos = [];
+            while ($row = $result->fetch_assoc()) {
+                $productos[] = $row;
+            }
+            echo json_encode(['productos' => $productos]);
+            break;
+        }
+
+        // Obtener pedidos del usuario (por defecto)
         $sql = "SELECT p.*, 
                 GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                 FROM pedidos p

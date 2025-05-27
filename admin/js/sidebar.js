@@ -19,6 +19,9 @@ function loadSidebar(activePage) {
             <a class="nav-link text-white${activePage==='estadisticas' ? ' active' : ''}" href="estadisticas.html"><i class="bi bi-graph-up-arrow me-2"></i>Estadísticas</a>
         </li>
         <li class="nav-item mb-2">
+            <a class="nav-link text-white${activePage==='recomendaciones' ? ' active' : ''}" href="recomendaciones.html"><i class="bi bi-stars me-2"></i>Recomendaciones</a>
+        </li>
+        <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='configuracion' ? ' active' : ''}" href="configuracion.html"><i class="bi bi-gear me-2"></i>Configuración</a>
         </li>
     </ul>`;

@@ -57,41 +57,41 @@
                 <tbody id="usuariosTableBody"></tbody>
             </table>
         </div>
-        <!-- Modal de Editar Usuario -->
-        <div class="modal fade" id="editUsuarioModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Usuario</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editUsuarioForm">
-                            <input type="hidden" id="editUsuarioId">
-                            <div class="mb-3">
-                                <label for="editNombre" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="editNombre" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="editEmail" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editTipo" class="form-label">Tipo</label>
-                                <select class="form-select" id="editTipo">
-                                    <option value="admin">Admin</option>
-                                    <option value="cliente">Cliente</option>
-                                    <option value="vendedor">Vendedor</option>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="saveEditUsuario">Guardar Cambios</button>
-                    </div>
-                </div>
+        <!-- Modal de Editar Usuario NUEVO -->
+        <div class="modal fade" id="editUsuarioModal" tabindex="-1" aria-labelledby="editUsuarioModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editUsuarioModalLabel">Editar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <form id="editUsuarioForm">
+                  <input type="hidden" id="editUsuarioId">
+                  <div class="mb-3">
+                    <label for="editNombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="editNombre" required autocomplete="off">
+                  </div>
+                  <div class="mb-3">
+                    <label for="editEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="editEmail" required autocomplete="off">
+                  </div>
+                  <div class="mb-3">
+                    <label for="editTipo" class="form-label">Tipo</label>
+                    <select class="form-select" id="editTipo">
+                      <option value="admin">Admin</option>
+                      <option value="cliente">Cliente</option>
+                      <option value="vendedor">Vendedor</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-success w-100" id="saveEditUsuario" style="font-size:1.1rem;">Guardar Cambios</button>
+                <button type="button" class="btn btn-secondary w-100 mt-2" data-bs-dismiss="modal">Cancelar</button>
+              </div>
             </div>
+          </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>

@@ -28,7 +28,8 @@ switch ($metodo) {
             exit;
         }
 
-        // Iniciar transacción
+        // Iniciar transacció
+        
         $conexion->begin_transaction();
 
         try {

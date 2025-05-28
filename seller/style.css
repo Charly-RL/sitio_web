@@ -1,0 +1,35 @@
+/* Estilos básicos para el panel de vendedor */
+.sidebar-header {
+    background: #343a40;
+    color: #fff;
+}
+#sellerSidebar {
+    min-height: 100vh;
+    width: 220px;
+    background: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+}
+#sellerSidebar .nav-link.active {
+    background: #495057;
+    color: #fff;
+}
+#sellerSidebar .nav-link {
+    color: #fff;
+}
+#sellerSidebar .nav-link:hover {
+    background: #495057;
+    color: #fff;
+}
+@media (max-width: 991px) {
+    #sellerSidebar {
+        position: absolute;
+        z-index: 1050;
+        left: -220px;
+        top: 0;
+        height: 100vh;
+    }
+    #sellerSidebar.show {
+        left: 0;
+    }
+}

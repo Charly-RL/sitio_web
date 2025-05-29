@@ -1,6 +1,53 @@
-/* seller.css - Estilos personalizados para el panel de vendedor */
 .admin-container {
     padding: 2rem 0;
+}
+.table img {
+    max-width: 50px;
+    height: auto;
+}
+/* seller.css - Estilos personalizados para el panel de vendedor */
+.sidebar-seller {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 250px;
+    height: 100vh;
+    z-index: 1040;
+    transition: left 0.3s;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+.sidebar-seller.show {
+    left: 0;
+}
+.sidebar-seller .nav-link.active, .sidebar-seller .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+}
+@media (max-width: 991.98px) {
+    .sidebar-seller {
+        width: 80vw;
+        min-width: 180px;
+    }
+}
+.seller-container {
+    margin-left: 260px;
+    padding: 2rem 0;
+    min-height: 80vh;
+    animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+@media (max-width: 991.98px) {
+    .seller-container {
+        margin-left: 0;
+        padding: 1rem 0.5rem;
+    }
 }
 .table img {
     max-width: 50px;

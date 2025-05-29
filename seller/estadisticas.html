@@ -1,37 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas de Vendedor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="js/seller.css">
     <style>
-        .sidebar-seller {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100vh;
-            z-index: 1040;
-            transition: left 0.3s;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .sidebar-seller .nav-link.active, .sidebar-seller .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .sidebar-seller.show {
-            left: 0;
-        }
-        .seller-container {
-            margin-left: 250px;
-            padding: 2rem 0;
-            min-height: 80vh;
-            animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
+        /* Animación de fade-in para el contenido principal */
+        .admin-container {
             opacity: 0;
             transform: translateY(30px);
+            animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
         }
         @keyframes fadeInUp {
             to {
@@ -39,47 +14,49 @@
                 transform: none;
             }
         }
-        @media (max-width: 991.98px) {
-            .sidebar-seller {
-                left: -260px;
-                width: 80vw;
-                min-width: 180px;
-            }
-            .sidebar-seller.show {
-                left: 0;
-            }
-            .seller-container {
-                margin-left: 0;
-                padding: 1rem 0.5rem;
+        .sidebar-admin { position: fixed; top: 0; left: -260px; width: 250px; height: 100vh; z-index: 1040; transition: left 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+        .sidebar-admin.show { left: 0; }
+        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover { background: rgba(255,255,255,0.1); }
+        @media (max-width: 991.98px) { .sidebar-admin { width: 80vw; min-width: 180px; } }
+        /* Animación para las tarjetas de estadísticas */
+        .estadistica-card {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUpCard 0.7s cubic-bezier(.4,2,.6,1) 0.3s forwards;
+        }
+        @keyframes fadeInUpCard {
+            to {
+                opacity: 1;
+                transform: none;
             }
         }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas de Ventas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="js/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .sidebar-admin { position: fixed; top: 0; left: -260px; width: 250px; height: 100vh; z-index: 1040; transition: left 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+        .sidebar-admin.show { left: 0; }
+        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover { background: rgba(255,255,255,0.1); }
+        @media (max-width: 991.98px) { .sidebar-admin { width: 80vw; min-width: 180px; } }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
+        <div class="container">
             <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
                 <i class="bi bi-list"></i>
             </button>
             <a class="navbar-brand" href="../index.html">Mi Tienda</a>
         </div>
     </nav>
-    <div id="sellerSidebar" class="sidebar-seller bg-dark text-white"></div>
-    <!-- Botón de cerrar dentro de la sidebar -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sellerSidebar');
-        if (sidebar && !document.getElementById('sidebarClose')) {
-            sidebar.insertAdjacentHTML('afterbegin', `
-                <div class="sidebar-header d-flex justify-content-between align-items-center p-3 border-bottom">
-                    <span class="fw-bold">Vendedor</span>
-                    <button class="btn btn-sm btn-close btn-close-white" id="sidebarClose" aria-label="Cerrar"></button>
-                </div>
-            `);
-        }
-    });
-    </script>
-    <div class="container seller-container mt-4">
+    <!-- Sidebar -->
+    <div id="sellerSidebar" class="sidebar-admin bg-dark text-white"></div>
+    <div class="container admin-container mt-4">
         <h2>Estadísticas de Ventas</h2>
         <div class="row mb-4">
             <div class="col-md-4">
@@ -101,8 +78,8 @@
             <div class="col-md-4">
                 <div class="card text-bg-warning mb-3 estadistica-card">
                     <div class="card-body">
-                        <h5 class="card-title">Productos Vendidos</h5>
-                        <p class="card-text fs-3" id="statProductos">0</p>
+                        <h5 class="card-title">Clientes</h5>
+                        <p class="card-text fs-3" id="statClientes">0</p>
                     </div>
                 </div>
             </div>
@@ -142,32 +119,34 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     // Sidebar toggle logic
     document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.getElementById('sellerSidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
-        // Delegar el evento para cerrar la sidebar
-        document.addEventListener('click', function(e) {
-            if (sidebar && sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
-            if (e.target && e.target.id === 'sidebarClose') {
-                sidebar.classList.remove('show');
-            }
-        });
+        const sidebarClose = document.getElementById('sidebarClose');
         if (sidebarToggle && sidebar) {
             sidebarToggle.addEventListener('click', function() {
                 sidebar.classList.add('show');
             });
         }
+        if (sidebarClose && sidebar) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (sidebar.classList.contains('show')) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
     });
 
-    // Estadísticas de ventas con datos reales (solo del vendedor)
+    // Estadísticas de ventas con datos reales
     $(function() {
         let estadisticas = null;
         let chart = null;
@@ -178,13 +157,16 @@
             if (!estadisticas) return;
             let labels = [], data = [];
             if (tipo === 'dia' && estadisticas.ventas_por_dia) {
+                // Mostrar SIEMPRE los últimos 7 días reales (hoy y 6 anteriores), aunque no haya ventas
                 let diasAMostrar = 7;
                 let hoy = new Date();
                 hoy.setHours(0,0,0,0);
+                // Crear un mapa de fecha (YYYY-MM-DD) a total
                 let mapaVentas = {};
                 estadisticas.ventas_por_dia.forEach(v => {
                     mapaVentas[v.dia] = Number(v.total);
                 });
+                // Generar los últimos 7 días (de hoy hacia atrás)
                 for (let i = diasAMostrar - 1; i >= 0; i--) {
                     let fecha = new Date(hoy);
                     fecha.setDate(hoy.getDate() - i);
@@ -229,21 +211,15 @@
         function cargarEstadisticas() {
             const tipo = $('#selectTipoGrafica').val();
             const anio = $('#inputAnio').val();
-            let url = '../api/pedidos.php?accion=estadisticas_vendedor';
+            let url = '../api/pedidos.php?accion=estadisticas';
             if (anio) url += `&anio=${anio}`;
             $.get(url, function(response) {
                 if (response.success) {
                     estadisticas = response;
+                    // Totales
                     $('#statTotalVentas').text(`$${Number(response.total_ventas).toLocaleString('es-MX', {minimumFractionDigits:2})}`);
                     $('#statPedidos').text(response.total_pedidos);
-                    $('#statProductos').text(response.total_productos);
                     renderGrafica(tipo);
-                } else {
-                    // Si no hay datos, limpiar
-                    $('#statTotalVentas').text('$0.00');
-                    $('#statPedidos').text('0');
-                    $('#statProductos').text('0');
-                    if (chart) chart.destroy();
                 }
             });
         }
@@ -256,21 +232,25 @@
             cargarEstadisticas();
         });
 
-        // Top productos vendidos del vendedor
-        function cargarTopProductos() {
-            $.get('../api/pedidos.php?accion=masvendidos_vendedor', function(response) {
-                const tbody = $('#tablaTopProductos tbody');
-                tbody.empty();
-                if (response.productos && response.productos.length > 0) {
-                    response.productos.forEach(p => {
-                        tbody.append(`<tr><td>${p.nombre}</td><td>${p.cantidad_vendida}</td></tr>`);
-                    });
-                } else {
-                    tbody.append('<tr><td colspan="2">Sin datos</td></tr>');
-                }
-            });
-        }
-        cargarTopProductos();
+        // 2. Obtener total de clientes
+        $.get('../api/usuarios.php', function(response) {
+            if (response.usuarios) {
+                $('#statClientes').text(response.usuarios.length);
+            }
+        });
+
+        // 3. Obtener top productos vendidos
+        $.get('../api/pedidos.php?accion=masvendidos', function(response) {
+            const tbody = $('#tablaTopProductos tbody');
+            tbody.empty();
+            if (response.productos && response.productos.length > 0) {
+                response.productos.forEach(p => {
+                    tbody.append(`<tr><td>${p.nombre}</td><td>${p.cantidad_vendida}</td></tr>`);
+                });
+            } else {
+                tbody.append('<tr><td colspan="2">Sin datos</td></tr>');
+            }
+        });
     });
     </script>
 </body>

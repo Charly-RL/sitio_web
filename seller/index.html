@@ -3,69 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Vendedor</title>
+    <title>Panel de Vendedor - Mi Tienda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="js/seller.css">
+    <style>
+        .sidebar-seller {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 250px;
+            height: 100vh;
+            z-index: 1040;
+            transition: left 0.3s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        }
+        .sidebar-seller.show {
+            left: 0;
+        }
+        .sidebar-seller .nav-link.active, .sidebar-seller .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        @media (max-width: 991.98px) {
+            .sidebar-seller {
+                width: 80vw;
+                min-width: 180px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
+            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
+                <i class="bi bi-list"></i>
+            </button>
             <a class="navbar-brand" href="../index.html">Mi Tienda</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="../index.html">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Vendedor</a>
+                        <a class="nav-link active" href="index.html">Panel Vendedor</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">Cerrar Sesión</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <link rel="stylesheet" href="style.css">
-    <div class="d-flex">
-        <div id="sellerSidebar" class="bg-secondary text-white p-0"></div>
-        <div class="container my-5">
-            <h2>Panel de Vendedor</h2>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-cash-coin display-4"></i>
-                            <h5 class="card-title mt-2">Ventas hechas</h5>
-                            <a href="ventas.html" class="btn btn-primary">Ver ventas</a>
-                        </div>
-                    </div>
+    <!-- Sidebar -->
+    <div id="sellerSidebar" class="sidebar-seller bg-dark text-white"></div>
+
+    <div class="container admin-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Mis Productos</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Pedir Cambio</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Nuevo Producto -->
+
+    <!-- Modal de Petición de Cambio -->
+    <div class="modal fade" id="peticionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Petición de Cambio de Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="col-md-6">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-box-seam display-4"></i>
-                            <h5 class="card-title mt-2">Inventario</h5>
-                            <a href="inventario.html" class="btn btn-primary">Ver inventario</a>
+                <div class="modal-body">
+                    <form id="peticionForm">
+                        <input type="hidden" id="peticionProductId">
+                        <div class="mb-3">
+                            <label for="peticionMensaje" class="form-label">Mensaje para el administrador</label>
+                            <textarea class="form-control" id="peticionMensaje" rows="4" required placeholder="Describe el cambio que solicitas..."></textarea>
                         </div>
-                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="enviarPeticion">Enviar Petición</button>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Modal de Editar Producto -->
+
+    <!-- Modal de Editar Producto (Deshabilitado para vendedores) -->
+    <!--
+    <div class="modal fade" id="editProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">La edición de productos solo está permitida para administradores.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/seller.js"></script>
     <script>
-        $(document).ready(function() {
-            // Verificar si el usuario es vendedor
-            $.get('../api/auth.php?accion=verificar', function(response) {
-                if (!response.autenticado || response.tipo !== 'vendedor') {
-                    window.location.href = '../auth/login.html';
-                }
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sellerSidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('show');
             });
+        }
+        if (sidebarClose && sidebar) {
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (sidebar.classList.contains('show')) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
         });
+    });
     </script>
 </body>
 </html>

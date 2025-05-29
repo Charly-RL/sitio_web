@@ -9,7 +9,12 @@ function loadSidebarSeller(activePage) {
         <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='index' ? ' active' : ''}" href="index.html"><i class="bi bi-box-seam me-2"></i>Mis Productos</a>
         </li>
-        <!-- Puedes agregar más opciones aquí si lo deseas -->
+        <li class="nav-item mb-2">
+            <a class="nav-link text-white${activePage==='estadisticas' ? ' active' : ''}" href="estadisticas.html"><i class="bi bi-bar-chart me-2"></i>Estadísticas</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link text-white${activePage==='reportes' ? ' active' : ''}" href="reportes.html"><i class="bi bi-flag me-2"></i>Reportes</a>
+        </li>
     </ul>`;
     const sidebar = document.getElementById('sellerSidebar');
     if (sidebar) sidebar.innerHTML = sidebarHtml;

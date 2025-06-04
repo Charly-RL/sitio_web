@@ -20,14 +20,29 @@
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <div class="invalid-feedback"><!-- valida formularios -->
+                                    El nombre debe tener al menos 3 caracteres
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">
+                                    El correo no es valido
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">
+                                    La contraseña debe tener al menos 6 caracteres                        
+                                </div>
+                            </div>
+                            <div class="mb-3 formcheck">
+                                <input type="checkbox" name="terminos" id="terminos" class="form-check-input">
+                                <label for="terminos" class="form-check-label">
+                                    Acepto los terminos y condiciones
+                                </label>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Registrarse</button>
                         </form>
@@ -45,36 +60,84 @@
     $(document).ready(function() {
         $('#registerForm').submit(function(e) {
             e.preventDefault();
-            const data = {
-                nombre: $('#nombre').val(),
-                email: $('#email').val(),
-                password: $('#password').val()
-            };
-            $.ajax({
-                url: '../api/auth.php?accion=registro',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function(response) {
-                    if (response.error) {
-                        $('#errorAlert').text(response.error).removeClass('d-none');
-                        $('#successAlert').addClass('d-none');
-                    } else if (response.success) {
-                        $('#successAlert').text(response.success).removeClass('d-none');
-                        $('#errorAlert').addClass('d-none');
-                        $('#registerForm')[0].reset();
-                        setTimeout(() => {
-                            window.location.href = 'login.html';
-                        }, 1500);
-                    }
-                },
-                error: function() {
-                    $('#errorAlert').text('Error en la conexión').removeClass('d-none');
-                    $('#successAlert').addClass('d-none');
+            let validado = true;
+                //validar el nombre
+                let nombre = $("#nombre").val();
+                if(nombre.length < 3){
+                    $("#nombre").addClass("is-invalid");
+                    validado = false;
+                }else{
+                    $("#nombre").removeClass("is-invalid").addClass("is-valid");
+                }
+                //validar el correo
+                let email = $("#email").val();
+                //expresion regular para validar el correo,los que esta en corchetes hace que por lo menos exista un caracter
+                let correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if(!correoRegex.test(email)){
+                    $("#email").addClass("is-invalid");
+                    validado = false;
+                }else{
+                    $("#email").removeClass("is-invalid").addClass("is-valid");
+                }
+                let password = $("#password").val();
+                if(password.length < 6){
+                    $("#password").addClass("is-invalid");
+                    validado = false;
+                }else{
+                    $("#password").removeClass("is-invalid").addClass("is-valid");
+                }
+                //validar terminos
+                if(!$("#terminos").is(":checked")){
+                    $("#terminos").addClass("is-invalid");
+                    validado = false;
+                }else{
+                    $("#terminos").removeClass("is-invalid").addClass("is-valid");
+                }
+                //quitar el mensaje cuando a inicies a escribir
+                $("input").keypress(function(){
+                    $(this).removeClass("is-invalid is-valid")
+                });
+                $("#terminos").change(function(){
+                    $(this).removeClass("is-invalid is-valid");
+                });
+
+                //si todos los campos son validos se envia el formulario
+                if(validado){
+                    //alert("Formulario enviado");
+                    //this.submit();
+                    const data = {
+                        nombre: $('#nombre').val(),
+                        email: $('#email').val(),
+                        password: $('#password').val()
+                    };
+                    $.ajax({
+                        url: '../api/auth.php?accion=registro',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            if (response.error) {
+                                $('#errorAlert').text(response.error).removeClass('d-none');
+                                $('#successAlert').addClass('d-none');
+                            } else if (response.success) {
+                                $('#successAlert').text(response.success).removeClass('d-none');
+                                $('#errorAlert').addClass('d-none');
+                                $('#registerForm')[0].reset();
+                                setTimeout(() => {
+                                        window.location.href = 'login.html';
+                                    }, 1500);
+                                }
+                            },
+                            error: function() {
+                                $('#errorAlert').text('Error en la conexión').removeClass('d-none');
+                                $('#successAlert').addClass('d-none');
+                            }
+                    });
+                   
                 }
             });
         });
-    });
+            
     </script>
 </body>
 </html>

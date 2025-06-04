@@ -102,9 +102,6 @@
                 url: '../api/auth.php?accion=login',
                 type: 'POST',
                 contentType: 'application/json',
-                xhrFields: {
-                    withCredentials: true
-                },
                 data: JSON.stringify(data),
                 success: function(response) {
                     if (response.error) {

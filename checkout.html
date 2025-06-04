@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Botanas Kiky</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .checkout-step {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .checkout-step.active {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .address-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .address-card:hover {
+            transform: translateY(-5px);
+        }
+        .address-card.selected {
+            border: 2px solid #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Botanas Kiky</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container py-5">
+        <h2 class="mb-4">Finalizar Compra</h2>
+        
+        <!-- Progreso -->
+        <div class="progress mb-4" style="height: 3px;">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" id="checkoutProgress"></div>
+        </div>
+
+        <!-- Paso 1: Dirección de Envío -->
+        <div class="checkout-step active" id="step1">
+            <h4>1. Dirección de Envío</h4>
+            <div class="row mt-4" id="direccionesContainer">
+                <!-- Las direcciones guardadas se cargarán aquí -->
+            </div>
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#nuevaDireccionModal">
+                <i class="bi bi-plus-lg"></i> Agregar Nueva Dirección
+            </button>
+            <button class="btn btn-success mt-3 float-end" onclick="nextStep(1)" id="btnStep1">
+                Continuar <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Paso 2: Método de Pago -->
+        <div class="checkout-step" id="step2" style="display: none;">
+            <h4>2. Método de Pago</h4>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="metodoPago" id="pagoEfectivo" value="efectivo" checked>
+                        <label class="form-check-label" for="pagoEfectivo">
+                            <i class="bi bi-cash"></i> Pago en Efectivo
+                        </label>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="bi bi-info-circle"></i> 
+                            El pago se realizará al momento de la entrega.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-outline-secondary mt-3" onclick="prevStep(2)">
+                <i class="bi bi-arrow-left"></i> Anterior
+            </button>
+            <button class="btn btn-success mt-3 float-end" onclick="nextStep(2)">
+                Continuar <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Paso 3: Resumen del Pedido -->
+        <div class="checkout-step" id="step3" style="display: none;">
+            <h4>3. Confirmar Pedido</h4>
+            <div class="row mt-4">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumen de Productos</h5>
+                            <div class="table-responsive">
+                                <table class="table" id="resumenProductos">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total del Pedido</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Envío:</span>
+                                <span id="costoEnvio">Gratis</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <strong>Total:</strong>
+                                <strong id="total">$0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h5>Dirección de Envío:</h5>
+                <div id="direccionEnvioResumen" class="card p-3"></div>
+            </div>
+            <div class="mt-4">
+                <h5>Método de Pago:</h5>
+                <p><i class="bi bi-cash"></i> Pago en efectivo al momento de la entrega</p>
+            </div>
+            <button class="btn btn-outline-secondary mt-3" onclick="prevStep(3)">
+                <i class="bi bi-arrow-left"></i> Anterior
+            </button>
+            <button class="btn btn-success mt-3 float-end" onclick="confirmarPedido()">
+                <i class="bi bi-check-lg"></i> Confirmar Pedido
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Nueva Dirección -->
+    <div class="modal fade" id="nuevaDireccionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva Dirección</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nuevaDireccionForm">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Calle</label>
+                                <input type="text" class="form-control" name="calle" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Número Ext.</label>
+                                <input type="text" class="form-control" name="numero_ext" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número Int. (opcional)</label>
+                            <input type="text" class="form-control" name="numero_int">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Colonia</label>
+                            <input type="text" class="form-control" name="colonia" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" name="ciudad" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <input type="text" class="form-control" name="estado" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Código Postal</label>
+                                <input type="text" class="form-control" name="codigo_postal" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" name="telefono" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Referencias</label>
+                            <textarea class="form-control" name="referencias" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="es_principal" id="es_principal">
+                                <label class="form-check-label" for="es_principal">
+                                    Establecer como dirección principal
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarDireccion()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let direccionSeleccionada = null;
+        let carrito = [];
+        let currentStep = 1;
+
+        $(document).ready(function() {
+            // Verificar autenticación
+            $.get('api/auth.php?accion=verificar', function(response) {
+                if (!response.autenticado) {
+                    window.location.href = 'auth/login.html';
+                }
+            });
+
+            // Cargar direcciones y carrito
+            cargarDirecciones();
+            cargarCarrito();
+        });
+
+        function cargarDirecciones() {
+            $.get('api/direcciones.php', function(response) {
+                const container = $('#direccionesContainer');
+                container.empty();
+
+                if (!response.direcciones || response.direcciones.length === 0) {
+                    container.html('<div class="col-12"><p>No tienes direcciones guardadas.</p></div>');
+                    $('#btnStep1').prop('disabled', true);
+                    return;
+                }
+
+                response.direcciones.forEach(dir => {
+                    const card = `
+                        <div class="col-md-6 mb-3">
+                            <div class="card address-card" onclick="seleccionarDireccion(${dir.id})">
+                                <div class="card-body">
+                                    <h6 class="card-title">${dir.calle} ${dir.numero_ext}${dir.numero_int ? ' Int. ' + dir.numero_int : ''}</h6>
+                                    <p class="card-text">
+                                        ${dir.colonia}<br>
+                                        ${dir.ciudad}, ${dir.estado} C.P. ${dir.codigo_postal}<br>
+                                        Tel: ${dir.telefono}
+                                    </p>
+                                    ${dir.referencias ? `<small class="text-muted">Ref: ${dir.referencias}</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.append(card);
+
+                    if (dir.es_principal) {
+                        seleccionarDireccion(dir.id);
+                    }
+                });
+            });
+        }
+
+        function cargarCarrito() {
+            $.get('api/carrito.php', function(response) {
+                carrito = response.carrito || [];
+                actualizarResumenPedido();
+            });
+        }
+
+        function seleccionarDireccion(id) {
+            direccionSeleccionada = id;
+            $('.address-card').removeClass('selected');
+            $(`.address-card[onclick="seleccionarDireccion(${id})"]`).addClass('selected');
+            $('#btnStep1').prop('disabled', false);
+        }
+
+        function guardarDireccion() {
+            const formData = {};
+            $('#nuevaDireccionForm').serializeArray().forEach(item => {
+                formData[item.name] = item.value;
+            });
+
+            $.ajax({
+                url: 'api/direcciones.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.success) {
+                        $('#nuevaDireccionModal').modal('hide');
+                        cargarDirecciones();
+                        $('#nuevaDireccionForm')[0].reset();
+                    } else {
+                        alert(response.error || 'Error al guardar la dirección');
+                    }
+                },
+                error: function() {
+                    alert('Error al guardar la dirección');
+                }
+            });
+        }
+
+        function nextStep(step) {
+            if (step === 1 && !direccionSeleccionada) {
+                alert('Por favor selecciona una dirección de envío');
+                return;
+            }
+
+            $(`#step${step}`).removeClass('active').hide();
+            $(`#step${step + 1}`).addClass('active').show();
+            currentStep = step + 1;
+            updateProgress();
+
+            if (step === 2) {
+                actualizarResumenFinal();
+            }
+        }
+
+        function prevStep(step) {
+            $(`#step${step}`).removeClass('active').hide();
+            $(`#step${step - 1}`).addClass('active').show();
+            currentStep = step - 1;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / 2) * 100;
+            $('#checkoutProgress').css('width', `${progress}%`);
+        }
+
+        function actualizarResumenPedido() {
+            const tbody = $('#resumenProductos tbody');
+            tbody.empty();
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                tbody.append(`
+                    <tr>
+                        <td>${item.nombre}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${item.precio.toFixed(2)}</td>
+                        <td>$${subtotal.toFixed(2)}</td>
+                    </tr>
+                `);
+            });
+
+            $('#subtotal').text(`$${total.toFixed(2)}`);
+            $('#total').text(`$${total.toFixed(2)}`);
+        }
+
+        function actualizarResumenFinal() {
+            // Mostrar dirección seleccionada en el resumen
+            $.get(`api/direcciones.php?id=${direccionSeleccionada}`, function(response) {
+                if (response.direccion) {
+                    const dir = response.direccion;
+                    $('#direccionEnvioResumen').html(`
+                        ${dir.calle} ${dir.numero_ext}${dir.numero_int ? ' Int. ' + dir.numero_int : ''}<br>
+                        ${dir.colonia}<br>
+                        ${dir.ciudad}, ${dir.estado} C.P. ${dir.codigo_postal}<br>
+                        Tel: ${dir.telefono}
+                        ${dir.referencias ? `<br><small class="text-muted">Ref: ${dir.referencias}</small>` : ''}
+                    `);
+                }
+            });
+        }
+
+        function confirmarPedido() {
+            const pedido = {
+                direccion_id: direccionSeleccionada,
+                metodo_pago: $('input[name="metodoPago"]:checked').val()
+            };
+
+            $.ajax({
+                url: 'api/pedidos.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(pedido),
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = 'cliente/historial.html';
+                    } else {
+                        alert(response.error || 'Error al procesar el pedido');
+                    }
+                },
+                error: function() {
+                    alert('Error al procesar el pedido');
+                }
+            });
+        }
+
+        // Cerrar sesión
+        $('#logoutBtn').click(function() {
+            $.get('api/auth.php?accion=logout', function(response) {
+                if (response.success) {
+                    window.location.href = 'auth/login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

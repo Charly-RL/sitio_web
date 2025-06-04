@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Mi Tienda</title>
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="../CSS/bootstrap.min.css">
+    <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
+    <link rel="stylesheet" href="../CSS/admin.css"> <!-- corregido -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
     <style>
-        /* Animación de fade-in para el contenido principal */
+        /* Animación principal */
         .admin-container {
             opacity: 0;
             transform: translateY(30px);
             animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
         }
+
         @keyframes fadeInUp {
             to {
                 opacity: 1;
                 transform: none;
             }
         }
-    </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Mi Tienda</title>
-    <link rel="stylesheet" href="../CSS/bootstrap.min.css">
-    <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
-    <link rel="stylesheet" href="js/admin.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <style>
+
+        /* Sidebar */
         .sidebar-admin {
             position: fixed;
             top: 0;
@@ -33,12 +37,16 @@
             transition: left 0.3s;
             box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         }
+
         .sidebar-admin.show {
             left: 0;
         }
-        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover {
+
+        .sidebar-admin .nav-link.active,
+        .sidebar-admin .nav-link:hover {
             background: rgba(255,255,255,0.1);
         }
+
         @media (max-width: 991.98px) {
             .sidebar-admin {
                 width: 80vw;
@@ -47,7 +55,38 @@
         }
     </style>
 </head>
+
 <body>
+
+<!-- Scripts -->
+    <script src="../JS/jquery-3.7.1.min.js"></script>
+    <script src="../JS/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('adminSidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', () => sidebar.classList.add('show'));
+            }
+
+            if (sidebarClose && sidebar) {
+                sidebarClose.addEventListener('click', () => sidebar.classList.remove('show'));
+            }
+
+            document.addEventListener('click', function (e) {
+                if (sidebar.classList.contains('show') &&
+                    !sidebar.contains(e.target) &&
+                    !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
@@ -58,6 +97,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -79,11 +119,12 @@
     <!-- Sidebar -->
     <div id="adminSidebar" class="sidebar-admin bg-dark text-white"></div>
 
+    <!-- Contenido principal -->
     <div class="container admin-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Gestión de Productos</h2>
             <div>
-                <a href="peticiones.html" class="btn btn-warning me-2" style="font-weight:bold;">
+                <a href="peticiones.html" class="btn btn-warning me-2 fw-bold">
                     <i class="bi bi-envelope"></i> Ver Peticiones
                 </a>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProductModal">
@@ -92,7 +133,7 @@
             </div>
         </div>
 
-        <!-- Tabla de Productos -->
+        <!-- Tabla de productos -->
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -106,14 +147,12 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="productTableBody">
-                    
-                </tbody>
+                <tbody id="productTableBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal de Nuevo Producto -->
+    <!-- Modal: Nuevo producto -->
     <div class="modal fade" id="newProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -153,7 +192,7 @@
         </div>
     </div>
 
-    <!-- Modal de Editar Producto -->
+    <!-- Modal: Editar producto -->
     <div class="modal fade" id="editProductModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -193,37 +232,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="../JS/jquery-3.7.1.min.js"></script>
-    <script src="../JS/bootstrap.bundle.min.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/admin.js"></script>
-    <script>
-    // Sidebar toggle logic
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('adminSidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.add('show');
-            });
-        }
-        if (sidebarClose && sidebar) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-            });
-        }
-        // Cerrar sidebar al hacer click fuera (opcional)
-        document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
-        });
-    });
-    </script>
 </body>
 </html>

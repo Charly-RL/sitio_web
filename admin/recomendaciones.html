@@ -4,15 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recomendaciones - Administración</title>
+
+    <!-- Estilos externos -->
     <link rel="stylesheet" href="../CSS/bootstrap.min.css">
     <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
     <link rel="stylesheet" href="js/admin.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+    <!-- Estilos internos -->
     <style>
-        .sidebar-admin { position: fixed; top: 0; left: -260px; width: 250px; height: 100vh; z-index: 1040; transition: left 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
-        .sidebar-admin.show { left: 0; }
-        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover { background: rgba(255,255,255,0.1); }
-        /* Animación para el contenido de las pestañas */
+        .sidebar-admin {
+            position: fixed;
+            top: 0;
+            left: -260px;
+            width: 250px;
+            height: 100vh;
+            z-index: 1040;
+            transition: left 0.3s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        }
+        .sidebar-admin.show {
+            left: 0;
+        }
+        .sidebar-admin .nav-link.active,
+        .sidebar-admin .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
         .tab-pane.fade {
             opacity: 0;
             transition: opacity 0.1s ease-in-out;
@@ -21,7 +39,6 @@
             opacity: 1;
             transition: opacity 0.1s ease-in-out;
         }
-        /* Animación para la tarjeta interna */
         .tab-pane .card {
             transform: translateY(20px);
             opacity: 0;
@@ -34,6 +51,14 @@
     </style>
 </head>
 <body>
+
+    <!-- Scripts al inicio del body -->
+    <script src="../JS/jquery-3.7.1.min.js"></script>
+    <script src="../JS/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/recomendaciones.js"></script>
+
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
@@ -42,8 +67,11 @@
             <a class="navbar-brand" href="../index.html">Mi Tienda</a>
         </div>
     </nav>
+
     <!-- Sidebar -->
     <div id="adminSidebar" class="sidebar-admin bg-dark text-white"></div>
+
+    <!-- Contenido principal -->
     <div class="container admin-container mt-4">
         <h2>Recomendaciones</h2>
         <ul class="nav nav-tabs mb-3" id="recomendacionesTabs" role="tablist">
@@ -68,34 +96,46 @@
                 </button>
             </li>
         </ul>
+
         <div class="tab-content" id="recomendacionesTabContent">
             <div class="tab-pane fade show active" id="panel-stock" role="tabpanel" aria-labelledby="tab-stock" tabindex="0">
                 <div class="card h-100 mb-3">
-                    <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle"></i> Stock Crítico/Bajo</div>
+                    <div class="card-header bg-danger text-white">
+                        <i class="bi bi-exclamation-triangle"></i> Stock Crítico/Bajo
+                    </div>
                     <div class="card-body" id="recomendacionesStock">
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
+
             <div class="tab-pane fade" id="panel-ofertas" role="tabpanel" aria-labelledby="tab-ofertas" tabindex="0">
                 <div class="card h-100 mb-3">
-                    <div class="card-header bg-primary text-white"><i class="bi bi-tags"></i> Sugerencia de Oferta</div>
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-tags"></i> Sugerencia de Oferta
+                    </div>
                     <div class="card-body" id="recomendacionesOfertas">
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
+
             <div class="tab-pane fade" id="panel-masvendidos" role="tabpanel" aria-labelledby="tab-masvendidos" tabindex="0">
                 <div class="card h-100 mb-3">
-                    <div class="card-header bg-success text-white"><i class="bi bi-star-fill"></i> Más Vendidos</div>
+                    <div class="card-header bg-success text-white">
+                        <i class="bi bi-star-fill"></i> Más Vendidos
+                    </div>
                     <div class="card-body" id="recomendacionesMasVendidos">
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
+
             <div class="tab-pane fade" id="panel-pedir" role="tabpanel" aria-labelledby="tab-pedir" tabindex="0">
                 <div class="card h-100 mb-3">
-                    <div class="card-header bg-warning text-dark"><i class="bi bi-truck"></i> Pedir al Proveedor</div>
+                    <div class="card-header bg-warning text-dark">
+                        <i class="bi bi-truck"></i> Pedir al Proveedor
+                    </div>
                     <div class="card-body" id="recomendacionesPedir">
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
@@ -103,9 +143,5 @@
             </div>
         </div>
     </div>
-    <script src="../JS/jquery-3.7.1.min.js"></script>
-    <script src="../JS/bootstrap.bundle.min.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/recomendaciones.js"></script>
 </body>
 </html>

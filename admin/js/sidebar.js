@@ -24,9 +24,6 @@ function loadSidebar(activePage) {
         <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='recomendaciones' ? ' active' : ''}" href="recomendaciones.html"><i class="bi bi-stars me-2"></i>Recomendaciones</a>
         </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white${activePage==='ofertas' ? ' active' : ''}" href="ofertas.html"><i class="bi bi-tags me-2"></i>Ofertas</a>
-        </li>
     </ul>`;
     const sidebar = document.getElementById('adminSidebar');
     if (sidebar) sidebar.innerHTML = sidebarHtml;

@@ -32,7 +32,6 @@ $(document).ready(function() {
                 const row = `
                     <tr>
                         <td>${product.id}</td>
-                        <td><img src="${product.imagen || ''}" alt="Imagen" style="max-width:50px;"></td>
                         <td>${product.nombre}</td>
                         <td>${product.descripcion || ''}</td>
                         <td>$${product.precio}</td>

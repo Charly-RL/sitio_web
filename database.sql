@@ -9,7 +9,6 @@ CREATE TABLE usuarios (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     tipo ENUM('admin', 'cliente', 'vendedor') DEFAULT 'cliente',
-    telefono VARCHAR(20),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -18,15 +17,15 @@ CREATE TABLE direcciones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     calle VARCHAR(100) NOT NULL,
-    numero_ext VARCHAR(20) NOT NULL,
-    numero_int VARCHAR(20),
+    numero_ext VARCHAR(10) NOT NULL,
+    numero_int VARCHAR(10),
     colonia VARCHAR(100) NOT NULL,
     ciudad VARCHAR(100) NOT NULL,
     estado VARCHAR(100) NOT NULL,
-    codigo_postal VARCHAR(10) NOT NULL,
-    telefono VARCHAR(20),
-    referencias TEXT,
-    es_principal BOOLEAN DEFAULT false,
+    codigo_postal VARCHAR(5) NOT NULL,
+    telefono VARCHAR(15) NOT NULL,
+    instrucciones_entrega TEXT,
+    es_principal BOOLEAN DEFAULT FALSE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
@@ -46,10 +45,13 @@ CREATE TABLE productos (
 CREATE TABLE pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
+    direccion_id INT NOT NULL,
     estado ENUM('pendiente', 'procesando', 'enviado', 'entregado') DEFAULT 'pendiente',
     total DECIMAL(10,2) NOT NULL,
+    metodo_pago ENUM('efectivo', 'tarjeta', 'transferencia') NOT NULL,
     fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (direccion_id) REFERENCES direcciones(id)
 );
 
 -- Tabla de detalles de pedido

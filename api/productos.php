@@ -170,7 +170,7 @@ switch ($metodo) {
             echo json_encode(['error' => 'Error al eliminar el producto']);
         }
         break;
-        
+    
     default:
         echo json_encode(['error' => 'Método no permitido']);
         break;

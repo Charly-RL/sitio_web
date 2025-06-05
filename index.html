@@ -28,13 +28,22 @@
             top: -8px;
             right: 5px;
         }
+        .logo{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Botanas Kiky</a>
+            <a class="navbar-brand" href="index.html">
+                <img src="img/fondo1.jpg" class="logo">
+                Botanas Kiky
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -412,21 +421,23 @@
                 window.location.href = 'auth/login.html';
                 return;
             }
-
+            
             $.get('api/carrito.php', function(response) {
                 const cartItems = response.carrito || [];
                 if (cartItems.length === 0) {
                     alert('El carrito está vacío');
                     return;
+                }else{
+                    window.location.href = 'checkout.html';
                 }
-
+                /*
                 const pedido = {
                     productos: cartItems.map(item => ({
                         id: item.producto_id,
                         cantidad: item.cantidad
                     }))
                 };
-
+                
                 $.ajax({
                     url: 'api/pedidos.php',
                     type: 'POST',
@@ -452,7 +463,7 @@
                     error: function() {
                         alert('Error al procesar el pedido');
                     }
-                });
+                });*/
             });
         });
 

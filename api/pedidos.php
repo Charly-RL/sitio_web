@@ -21,65 +21,85 @@ $metodo = $_SERVER['REQUEST_METHOD'];
 switch ($metodo) {
     case 'POST':
         $data = json_decode(file_get_contents('php://input'), true);
-
-        if (!isset($data['productos']) || empty($data['productos'])) {
+        
+        // Verificar dirección y método de pago
+        if (!isset($data['direccion_id'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'No hay productos en el pedido']);
+            echo json_encode(['error' => 'No se especificó la dirección de envío']);
             exit;
         }
 
-        // Iniciar transacció
-        
+        if (!isset($data['metodo_pago'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No se especificó el método de pago']);
+            exit;
+        }
+
+        // Verificar que la dirección pertenezca al usuario
+        $stmt = $conexion->prepare("SELECT id FROM direcciones WHERE id = ? AND usuario_id = ?");
+        $stmt->bind_param("ii", $data['direccion_id'], $usuario_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Dirección de envío no válida']);
+            exit;
+        }
+
         $conexion->begin_transaction();
 
         try {
-            // Calcular total del pedido
+            // Obtener productos del carrito
+            $stmt = $conexion->prepare("SELECT c.*, p.precio, p.stock FROM carrito c 
+                                      JOIN productos p ON c.producto_id = p.id 
+                                      WHERE c.usuario_id = ?");
+            $stmt->bind_param("i", $usuario_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 0) {
+                throw new Exception("El carrito está vacío");
+            }
+
+            $productos = [];
             $total = 0;
-            foreach ($data['productos'] as $producto) {
-                $stmt = $conexion->prepare("SELECT precio, stock FROM productos WHERE id = ?");
-                $stmt->bind_param("i", $producto['id']);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $prod = $result->fetch_assoc();
 
-                if (!$prod) {
-                    throw new Exception("Producto no encontrado");
+            while ($item = $result->fetch_assoc()) {
+                if ($item['stock'] < $item['cantidad']) {
+                    throw new Exception("Stock insuficiente para " . $item['nombre']);
                 }
-
-                if ($prod['stock'] < $producto['cantidad']) {
-                    throw new Exception("Stock insuficiente");
-                }
-
-                $total += $prod['precio'] * $producto['cantidad'];
+                $subtotal = $item['precio'] * $item['cantidad'];
+                $total += $subtotal;
+                $productos[] = $item;
             }
 
             // Crear pedido
-            $stmt = $conexion->prepare("INSERT INTO pedidos (usuario_id, total) VALUES (?, ?)");
-            $stmt->bind_param("id", $usuario_id, $total);
+            $stmt = $conexion->prepare("INSERT INTO pedidos (usuario_id, direccion_id, total, metodo_pago) 
+                                      VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iids", $usuario_id, $data['direccion_id'], $total, $data['metodo_pago']);
             $stmt->execute();
-            $pedido_id = $stmt->insert_id;
+            $pedido_id = $conexion->insert_id;
 
             // Insertar detalles del pedido y actualizar stock
-            foreach ($data['productos'] as $producto) {
-                $stmt = $conexion->prepare("SELECT precio FROM productos WHERE id = ?");
-                $stmt->bind_param("i", $producto['id']);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $prod = $result->fetch_assoc();
-
-                // Insertar detalle
-                $subtotal = $prod['precio'] * $producto['cantidad'];
-                $stmt = $conexion->prepare("INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("iiidi", $pedido_id, $producto['id'], $producto['cantidad'], $prod['precio'], $subtotal);
+            foreach ($productos as $producto) {
+                $subtotal = $producto['precio'] * $producto['cantidad'];
+                
+                $stmt = $conexion->prepare("INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, 
+                                          precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("iiidi", $pedido_id, $producto['producto_id'], 
+                                $producto['cantidad'], $producto['precio'], $subtotal);
                 $stmt->execute();
 
                 // Actualizar stock
                 $stmt = $conexion->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?");
-                $stmt->bind_param("ii", $producto['cantidad'], $producto['id']);
+                $stmt->bind_param("ii", $producto['cantidad'], $producto['producto_id']);
                 $stmt->execute();
             }
 
-            // Confirmar transacción
+            // Limpiar carrito
+            $stmt = $conexion->prepare("DELETE FROM carrito WHERE usuario_id = ?");
+            $stmt->bind_param("i", $usuario_id);
+            $stmt->execute();
+
             $conexion->commit();
             echo json_encode(['success' => true, 'pedido_id' => $pedido_id]);
 

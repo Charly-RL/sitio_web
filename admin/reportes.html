@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="js/admin.css">
+    <script src="../JS/jquery-3.7.1.min.js"></script>
+    <script src="../JS/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/admin.js"></script>
 
     <style>
         .admin-container {
@@ -59,14 +63,14 @@
                 transform: none;
             }
         }
+        .logo{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
-</head>
-<body>
-    <!-- Scripts al inicio del body -->
-    <script src="../JS/jquery-3.7.1.min.js"></script>
-    <script src="../JS/bootstrap.bundle.min.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/admin.js"></script>
+
     <script>
         function descargarCSV(nombre, cabeceras, filas) {
             let csv = cabeceras.join(',') + '\n';
@@ -111,7 +115,8 @@
             });
         });
     </script>
-
+</head>
+<body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">

@@ -87,27 +87,31 @@
         }
 
         $(function() {
+            // Reporte de ventas por producto
             $('#btnReporteVentas').click(() => {
-                descargarCSV('ventas_productos.csv', ['Producto', 'Vendidos'], [
-                    ['Cacahuate Japones', 120],
-                    ['Cecina de Res', 80],
-                    ['Ositos', 60]
-                ]);
+                $.get('../api/pedidos.php?accion=masvendidos', function(response) {
+                    const cabeceras = ['Producto', 'Vendidos'];
+                    const filas = (response.productos || []).map(p => [p.nombre, p.cantidad_vendida]);
+                    descargarCSV('ventas_productos.csv', cabeceras, filas);
+                });
             });
 
+            // Reporte de usuarios
             $('#btnReporteUsuarios').click(() => {
-                descargarCSV('usuarios.csv', ['Usuario', 'Email'], [
-                    ['admin', 'admin@ejemplo.com'],
-                    ['usuario1', 'user1@correo.com']
-                ]);
+                $.get('../api/usuarios.php', function(response) {
+                    const cabeceras = ['Usuario', 'Email'];
+                    const filas = (response.usuarios || []).map(u => [u.nombre, u.email]);
+                    descargarCSV('usuarios.csv', cabeceras, filas);
+                });
             });
 
+            // Reporte de stock de productos
             $('#btnReporteStock').click(() => {
-                descargarCSV('stock_productos.csv', ['Producto', 'Stock'], [
-                    ['Cacahuate Japones', 10],
-                    ['Cecina de Res', 5],
-                    ['Ositos', 20]
-                ]);
+                $.get('../api/productos.php', function(response) {
+                    const cabeceras = ['Producto', 'Stock'];
+                    const filas = (response.productos || []).map(p => [p.nombre, p.stock]);
+                    descargarCSV('stock_productos.csv', cabeceras, filas);
+                });
             });
         });
     </script>

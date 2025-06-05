@@ -23,7 +23,6 @@ $(document).ready(function() {
                 const row = `
                     <tr>
                         <td>${product.id}</td>
-                        <td> Aqui va imagen </td>
                         <td>${product.nombre}</td>
                         <td>${product.descripcion || ''}</td>
                         <td>$${product.precio}</td>

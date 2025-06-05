@@ -9,7 +9,26 @@ CREATE TABLE usuarios (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     tipo ENUM('admin', 'cliente', 'vendedor') DEFAULT 'cliente',
+    telefono VARCHAR(20),
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla de direcciones
+CREATE TABLE direcciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    calle VARCHAR(100) NOT NULL,
+    numero_ext VARCHAR(20) NOT NULL,
+    numero_int VARCHAR(20),
+    colonia VARCHAR(100) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    estado VARCHAR(100) NOT NULL,
+    codigo_postal VARCHAR(10) NOT NULL,
+    telefono VARCHAR(20),
+    referencias TEXT,
+    es_principal BOOLEAN DEFAULT false,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
 -- Tabla de productos

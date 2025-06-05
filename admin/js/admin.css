@@ -1,7 +1,45 @@
-/* admin.css - Estilos personalizados para el panel de administración */
-.admin-container {
-    padding: 2rem 0;
+/* Sidebar estilos para admin */
+.sidebar-admin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1040;
+    transition: left 0.3s;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    background: #212529;
+    overflow-y: auto;
 }
+.sidebar-admin:not(.show) {
+    left: -260px;
+}
+.sidebar-admin.show {
+    left: 0;
+}
+.sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+}
+@media (max-width: 991.98px) {
+    .sidebar-admin {
+        width: 80vw;
+        min-width: 180px;
+    }
+}
+/* Ajuste para que el contenido no quede debajo del navbar */
+.admin-container {
+    margin-left: 250px;
+    padding: 2rem 2rem 2rem 2rem;
+    transition: margin-left 0.3s;
+    padding-top: 80px; /* Altura navbar (aprox 56-64px) + espacio */
+}
+@media (max-width: 991.98px) {
+    .admin-container {
+        margin-left: 0;
+        padding: 1rem 0.5rem;
+    }
+}
+/* admin.css - Estilos personalizados para el panel de administración */
 .table img {
     max-width: 50px;
     height: auto;

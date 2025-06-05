@@ -1,267 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <style>
-        /* Animación de fade-in para el contenido principal */
-        .admin-container {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
-        }
-        .logo{
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-        .sidebar-admin { position: fixed; top: 0; left: -260px; width: 250px; height: 100vh; z-index: 1040; transition: left 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
-        .sidebar-admin.show { left: 0; }
-        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover { background: rgba(255,255,255,0.1); }
-        @media (max-width: 991.98px) { .sidebar-admin { width: 80vw; min-width: 180px; } }
-        /* Animación para las tarjetas de estadísticas */
-        .estadistica-card {
-            opacity: 0;
-            transform: translateY(40px);
-            animation: fadeInUpCard 0.7s cubic-bezier(.4,2,.6,1) 0.3s forwards;
-        }
-        @keyframes fadeInUpCard {
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-    </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas de Ventas</title>
-    <link rel="stylesheet" href="../CSS/bootstrap.min.css">
-    <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
-    <link rel="stylesheet" href="js/admin.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .sidebar-admin { position: fixed; top: 0; left: -260px; width: 250px; height: 100vh; z-index: 1040; transition: left 0.3s; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
-        .sidebar-admin.show { left: 0; }
-        .sidebar-admin .nav-link.active, .sidebar-admin .nav-link:hover { background: rgba(255,255,255,0.1); }
-        @media (max-width: 991.98px) { .sidebar-admin { width: 80vw; min-width: 180px; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas de Ventas</title>
+
+  <!-- Estilos y librerías -->
+  <link rel="stylesheet" href="../CSS/bootstrap.min.css">
+  <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="js/admin.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../JS/jquery-3.7.1.min.js"></script>
+  <script src="../JS/bootstrap.bundle.min.js"></script>
+  <script src="js/sidebar.js"></script>
+
+  <!-- Estilos personalizados -->
+  <style>
+    .admin-container {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1) 0.1s forwards;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .sidebar-admin {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100vh;
+      z-index: 1040;
+      transition: left 0.3s;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+    .sidebar-admin.show { left: 0; }
+    .sidebar-admin .nav-link.active,
+    .sidebar-admin .nav-link:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    @media (max-width: 991.98px) {
+      .sidebar-admin {
+        width: 80vw;
+        min-width: 180px;
+      }
+    }
+
+    .estadistica-card {
+      opacity: 0;
+      transform: translateY(40px);
+      animation: fadeInUpCard 0.7s cubic-bezier(.4,2,.6,1) 0.3s forwards;
+    }
+    @keyframes fadeInUpCard {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
-                <i class="bi bi-list"></i>
-            </button>
-            <a class="navbar-brand" href="../index.html">
-                <img src="../img/fondo1.jpg" class="logo">
-            </a>
-        </div>
-    </nav>
-    <!-- Sidebar -->
-    <div id="adminSidebar" class="sidebar-admin bg-dark text-white"></div>
-    <div class="container admin-container mt-4">
-        <h2>Estadísticas de Ventas</h2>
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-bg-primary mb-3 estadistica-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Ventas</h5>
-                        <p class="card-text fs-3" id="statTotalVentas">$0.00</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-bg-success mb-3 estadistica-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Pedidos</h5>
-                        <p class="card-text fs-3" id="statPedidos">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-bg-warning mb-3 estadistica-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Clientes</h5>
-                        <p class="card-text fs-3" id="statClientes">0</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card estadistica-card">
-                    <div class="card-header">Ventas por Mes</div>
-                    <div class="card-body">
-                        <div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
-                            <label class="form-label mb-0 me-2">Ver por:</label>
-                            <select id="selectTipoGrafica" class="form-select form-select-sm w-auto">
-                                <option value="dia">Día (últimos 7)</option>
-                                <option value="semana">Semana (últimas 8)</option>
-                                <option value="mes">Mes (últimos 12)</option>
-                            </select>
-                            <input type="number" id="inputAnio" class="form-control form-control-sm w-auto ms-2" min="2000" max="2100" value="" placeholder="Año">
-                        </div>
-                        <canvas id="ventasMesChart" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card estadistica-card">
-                    <div class="card-header">Top Productos Vendidos</div>
-                    <div class="card-body">
-                        <table class="table table-sm" id="tablaTopProductos">
-                            <thead>
-                                <tr><th>Producto</th><th>Cantidad</th></tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Script de lógica -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sidebar = document.getElementById('adminSidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      document.addEventListener('click', function (e) {
+        if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+          sidebar.classList.remove('show');
+        }
+      });
+      if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', function () {
+          sidebar.classList.add('show');
+        });
+      }
+    });
+
+    $(function () {
+      let estadisticas = null;
+      let chart = null;
+      const diasSemana = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+      const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+      function renderGrafica(tipo) {
+        if (!estadisticas) return;
+        let labels = [], data = [];
+
+        if (tipo === 'dia' && estadisticas.ventas_por_dia) {
+          let diasAMostrar = 7;
+          let hoy = new Date(); hoy.setHours(0,0,0,0);
+          let mapaVentas = {};
+          estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));
+          for (let i = diasAMostrar - 1; i >= 0; i--) {
+            let fecha = new Date(hoy); fecha.setDate(hoy.getDate() - i);
+            let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');
+            let fechaStr = `${yyyy}-${mm}-${dd}`;
+            labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());
+            data.push(mapaVentas[fechaStr] || 0);
+          }
+        } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
+          labels = estadisticas.ventas_por_semana.map(v => {
+            const fecha = new Date(v.inicio_semana);
+            return 'Semana ' + v.semana + ' (' + fecha.toLocaleDateString('es-MX') + ')';
+          });
+          data = estadisticas.ventas_por_semana.map(v => Number(v.total));
+        } else if (tipo === 'mes' && estadisticas.ventas_por_mes) {
+          labels = estadisticas.ventas_por_mes.map(v => meses[parseInt(v.mes)-1] + ' ' + v.anio);
+          data = estadisticas.ventas_por_mes.map(v => Number(v.total));
+        }
+
+        if (chart) chart.destroy();
+        const ctx = document.getElementById('ventasMesChart').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ label: 'Ventas ($)', data: data, backgroundColor: 'rgba(54, 162, 235, 0.7)' }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      function cargarEstadisticas() {
+        const tipo = $('#selectTipoGrafica').val();
+        const anio = $('#inputAnio').val();
+        let url = '../api/pedidos.php?accion=estadisticas';
+        if (anio) url += `&anio=${anio}`;
+        $.get(url, function(response) {
+          if (response.success) {
+            estadisticas = response;
+            $('#statTotalVentas').text(`$${Number(response.total_ventas).toLocaleString('es-MX', {minimumFractionDigits:2})}`);
+            $('#statPedidos').text(response.total_pedidos);
+            renderGrafica(tipo);
+          }
+        });
+      }
+
+      $('#inputAnio').val(new Date().getFullYear());
+      cargarEstadisticas();
+      $('#selectTipoGrafica, #inputAnio').on('change', cargarEstadisticas);
+
+      $.get('../api/usuarios.php', function(response) {
+        if (response.usuarios) {
+          $('#statClientes').text(response.usuarios.length);
+        }
+      });
+
+      $.get('../api/pedidos.php?accion=masvendidos', function(response) {
+        const tbody = $('#tablaTopProductos tbody');
+        tbody.empty();
+        if (response.productos && response.productos.length > 0) {
+          response.productos.forEach(p => {
+            tbody.append(`<tr><td>${p.nombre}</td><td>${p.cantidad_vendida}</td></tr>`);
+          });
+        } else {
+          tbody.append('<tr><td colspan="2">Sin datos</td></tr>');
+        }
+      });
+    });
+  </script>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <button class="btn btn-outline-light me-2" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="../index.html">Mi Tienda</a>
     </div>
-    <script src="../JS/jquery-3.7.1.min.js"></script>
-    <script src="../JS/bootstrap.bundle.min.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script>
-    // Sidebar toggle logic
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('adminSidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.add('show');
-            });
-        }
-        if (sidebarClose && sidebar) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-            });
-        }
-        document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
-        });
-    });
+  </nav>
 
-    // Estadísticas de ventas con datos reales
-    $(function() {
-        let estadisticas = null;
-        let chart = null;
-        const diasSemana = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-        const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  <!-- Sidebar -->
+  <div id="adminSidebar" class="sidebar-admin bg-dark text-white"></div>
 
-        function renderGrafica(tipo) {
-            if (!estadisticas) return;
-            let labels = [], data = [];
-            if (tipo === 'dia' && estadisticas.ventas_por_dia) {
-                // Mostrar SIEMPRE los últimos 7 días reales (hoy y 6 anteriores), aunque no haya ventas
-                let diasAMostrar = 7;
-                let hoy = new Date();
-                hoy.setHours(0,0,0,0);
-                // Crear un mapa de fecha (YYYY-MM-DD) a total
-                let mapaVentas = {};
-                estadisticas.ventas_por_dia.forEach(v => {
-                    mapaVentas[v.dia] = Number(v.total);
-                });
-                // Generar los últimos 7 días (de hoy hacia atrás)
-                for (let i = diasAMostrar - 1; i >= 0; i--) {
-                    let fecha = new Date(hoy);
-                    fecha.setDate(hoy.getDate() - i);
-                    let yyyy = fecha.getFullYear();
-                    let mm = (fecha.getMonth() + 1).toString().padStart(2, '0');
-                    let dd = fecha.getDate().toString().padStart(2, '0');
-                    let fechaStr = `${yyyy}-${mm}-${dd}`;
-                    let diaSemana = fecha.getDay();
-                    labels.push(diasSemana[diaSemana] + ' ' + fecha.getDate());
-                    data.push(mapaVentas[fechaStr] ? mapaVentas[fechaStr] : 0);
-                }
-            } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
-                labels = estadisticas.ventas_por_semana.map(v => {
-                    const fecha = new Date(v.inicio_semana);
-                    return 'Semana ' + v.semana + ' (' + fecha.toLocaleDateString('es-MX') + ')';
-                });
-                data = estadisticas.ventas_por_semana.map(v => Number(v.total));
-            } else if (tipo === 'mes' && estadisticas.ventas_por_mes) {
-                labels = estadisticas.ventas_por_mes.map(v => meses[parseInt(v.mes)-1] + ' ' + v.anio);
-                data = estadisticas.ventas_por_mes.map(v => Number(v.total));
-            }
-            if (chart) chart.destroy();
-            const ctx = document.getElementById('ventasMesChart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Ventas ($)',
-                        data: data,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
+  <!-- Contenido principal -->
+  <div class="container admin-container mt-4">
+    <h2>Estadísticas de Ventas</h2>
 
-        function cargarEstadisticas() {
-            const tipo = $('#selectTipoGrafica').val();
-            const anio = $('#inputAnio').val();
-            let url = '../api/pedidos.php?accion=estadisticas';
-            if (anio) url += `&anio=${anio}`;
-            $.get(url, function(response) {
-                if (response.success) {
-                    estadisticas = response;
-                    // Totales
-                    $('#statTotalVentas').text(`$${Number(response.total_ventas).toLocaleString('es-MX', {minimumFractionDigits:2})}`);
-                    $('#statPedidos').text(response.total_pedidos);
-                    renderGrafica(tipo);
-                }
-            });
-        }
+    <!-- Tarjetas de resumen -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card text-bg-primary mb-3 estadistica-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Ventas</h5>
+            <p class="card-text fs-3" id="statTotalVentas">$0.00</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-bg-success mb-3 estadistica-card">
+          <div class="card-body">
+            <h5 class="card-title">Pedidos</h5>
+            <p class="card-text fs-3" id="statPedidos">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-bg-warning mb-3 estadistica-card">
+          <div class="card-body">
+            <h5 class="card-title">Clientes</h5>
+            <p class="card-text fs-3" id="statClientes">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Inicializar año actual
-        $('#inputAnio').val(new Date().getFullYear());
-        cargarEstadisticas();
-
-        $('#selectTipoGrafica, #inputAnio').on('change', function() {
-            cargarEstadisticas();
-        });
-
-        // 2. Obtener total de clientes
-        $.get('../api/usuarios.php', function(response) {
-            if (response.usuarios) {
-                $('#statClientes').text(response.usuarios.length);
-            }
-        });
-
-        // 3. Obtener top productos vendidos
-        $.get('../api/pedidos.php?accion=masvendidos', function(response) {
-            const tbody = $('#tablaTopProductos tbody');
-            tbody.empty();
-            if (response.productos && response.productos.length > 0) {
-                response.productos.forEach(p => {
-                    tbody.append(`<tr><td>${p.nombre}</td><td>${p.cantidad_vendida}</td></tr>`);
-                });
-            } else {
-                tbody.append('<tr><td colspan="2">Sin datos</td></tr>');
-            }
-        });
-    });
-    </script>
+    <!-- Gráfica y top productos -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="card estadistica-card">
+          <div class="card-header">Ventas por Mes</div>
+          <div class="card-body">
+            <div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
+              <label class="form-label mb-0 me-2">Ver por:</label>
+              <select id="selectTipoGrafica" class="form-select form-select-sm w-auto">
+                <option value="dia">Día (7 días)</option>
+                <option value="semana">Semana (8 semanas)</option>
+                <option value="mes">Mes (12 meses)</option>
+              </select>
+              <input type="number" id="inputAnio" class="form-control form-control-sm w-auto ms-2" min="2000" max="2100" placeholder="Año">
+            </div>
+            <canvas id="ventasMesChart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card estadistica-card">
+          <div class="card-header">Top Productos Vendidos</div>
+          <div class="card-body">
+            <table class="table table-sm" id="tablaTopProductos">
+              <thead>
+                <tr><th>Producto</th><th>Cantidad</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
+

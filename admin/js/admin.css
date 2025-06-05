@@ -26,10 +26,12 @@
         min-width: 180px;
     }
 }
+/* Ajuste para que el contenido no quede debajo del navbar */
 .admin-container {
     margin-left: 250px;
-    padding: 2rem 0;
+    padding: 2rem 2rem 2rem 2rem;
     transition: margin-left 0.3s;
+    padding-top: 80px; /* Altura navbar (aprox 56-64px) + espacio */
 }
 @media (max-width: 991.98px) {
     .admin-container {

@@ -4,7 +4,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
-session_start();
+
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
@@ -145,12 +145,18 @@ switch ($metodo) {
         break;
         
     case 'DELETE':
-        if (!isset($_GET['id'])) {
+        // Verificar si el usuario es administrador
+        if (!esAdmin()) {
+            echo json_encode(['error' => 'No autorizado']);
+            exit;
+        }
+        
+        if (!isset($data['id'])) {
             echo json_encode(['error' => 'ID de producto no especificado']);
             exit;
         }
         
-        $id = $conexion->real_escape_string($_GET['id']);
+        $id = $conexion->real_escape_string($data['id']);
         
         // Verificar si el producto existe y eliminar
         $stmt = $conexion->prepare("DELETE FROM productos WHERE id = ?");

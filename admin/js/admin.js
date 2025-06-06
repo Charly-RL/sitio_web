@@ -129,6 +129,10 @@ $(document).ready(function() {
                     } else {
                         alert(response.error || 'Error al eliminar el producto');
                     }
+                },
+                error: function(xhr) {
+                    console.error('Error en la petición:', xhr.responseText);
+                    alert('Error al eliminar el producto. Por favor, intente nuevamente.');
                 }
             });
         }

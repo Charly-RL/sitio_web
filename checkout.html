@@ -6,6 +6,8 @@
     <title>Finalizar Compra - Botanas Kiky</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         .checkout-step {
             position: relative;
@@ -30,6 +32,156 @@
             font-weight: bold;
         }
     </style>
+    <script>
+        $(document).ready(function() {
+            // Verificar autenticación
+            $.get('api/auth.php?accion=verificar', function(response) {
+                if (!response.autenticado) {
+                    window.location.href = 'auth/login.html';
+                }
+            });
+
+            let direccionSeleccionada = null;
+
+            // Cargar direcciones del usuario
+            function cargarDirecciones() {
+                $.get('api/direcciones.php', function(response) {
+                    const container = $('#direccionesContainer');
+                    container.empty();
+
+                    if (!response.direcciones || response.direcciones.length === 0) {
+                        container.html('<p>No tienes direcciones guardadas.</p>');
+                        return;
+                    }
+
+                    response.direcciones.forEach(dir => {
+                        const card = `
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="direccion" 
+                                               value="${dir.id}" id="dir${dir.id}"
+                                               ${dir.es_principal ? 'checked' : ''}>
+                                        <label class="form-check-label" for="dir${dir.id}">
+                                            ${dir.calle} ${dir.numero_ext}
+                                            ${dir.numero_int ? ', Int. ' + dir.numero_int : ''}<br>
+                                            ${dir.colonia}, ${dir.ciudad}, ${dir.estado}<br>
+                                            CP: ${dir.codigo_postal}<br>
+                                            Tel: ${dir.telefono}
+                                            ${dir.es_principal ? '<span class="badge bg-primary ms-2">Principal</span>' : ''}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.append(card);
+                    });
+
+                    // Actualizar dirección seleccionada
+                    direccionSeleccionada = $('input[name="direccion"]:checked').val();
+                });
+            }
+
+            // Cargar resumen del carrito
+            function cargarResumen() {
+                $.get('api/carrito.php', function(response) {
+                    const tbody = $('#resumenItems');
+                    tbody.empty();
+                    let total = 0;
+
+                    response.carrito.forEach(item => {
+                        const subtotal = item.precio * item.cantidad;
+                        total += subtotal;
+                        tbody.append(`
+                            <tr>
+                                <td>${item.nombre}</td>
+                                <td class="text-end">${item.cantidad}x</td>
+                                <td class="text-end">$${subtotal.toFixed(2)}</td>
+                            </tr>
+                        `);
+                    });
+
+                    $('#resumenTotal').text('$' + total.toFixed(2));
+                });
+            }
+
+            // Guardar nueva dirección
+            $('#guardarDireccion').click(function() {
+                const direccionData = {
+                    calle: $('#calle').val(),
+                    numero_ext: $('#numeroExt').val(),
+                    numero_int: $('#numeroInt').val(),
+                    colonia: $('#colonia').val(),
+                    ciudad: $('#ciudad').val(),
+                    estado: $('#estado').val(),
+                    codigo_postal: $('#codigoPostal').val(),
+                    telefono: $('#telefono').val(),
+                    instrucciones_entrega: $('#instrucciones').val(),
+                    es_principal: $('#esPrincipal').is(':checked')
+                };
+
+                $.ajax({
+                    url: 'api/direcciones.php',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(direccionData),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#nuevaDireccionModal').modal('hide');
+                            cargarDirecciones();
+                            $('#nuevaDireccionForm')[0].reset();
+                        } else {
+                            alert(response.error || 'Error al guardar la dirección');
+                        }
+                    },
+                    error: function() {
+                        alert('Error al guardar la dirección');
+                    }
+                });
+            });
+
+            // Confirmar pedido
+            $('#btnConfirmarPedido').click(function() {
+                if (!direccionSeleccionada) {
+                    alert('Por favor, selecciona una dirección de envío');
+                    return;
+                }
+
+                const metodoPago = $('input[name="metodoPago"]:checked').val();
+                const pedidoData = {
+                    direccion_id: direccionSeleccionada,
+                    metodo_pago: metodoPago
+                };
+
+                $.ajax({
+                    url: 'api/pedidos.php',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(pedidoData),
+                    success: function(response) {
+                        if (response.success) {
+                            alert('¡Pedido realizado con éxito!');
+                            window.location.href = 'cliente/historial.html';
+                        } else {
+                            alert(response.error || 'Error al procesar el pedido');
+                        }
+                    },
+                    error: function() {
+                        alert('Error al procesar el pedido');
+                    }
+                });
+            });
+
+            // Event Listeners
+            $(document).on('change', 'input[name="direccion"]', function() {
+                direccionSeleccionada = $(this).val();
+            });
+
+            // Inicialización
+            cargarDirecciones();
+            cargarResumen();
+        });
+    </script>
 </head>
 <body>
     <!-- Navbar -->
@@ -183,158 +335,5 @@
             </div>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Verificar autenticación
-            $.get('api/auth.php?accion=verificar', function(response) {
-                if (!response.autenticado) {
-                    window.location.href = 'auth/login.html';
-                }
-            });
-
-            let direccionSeleccionada = null;
-
-            // Cargar direcciones del usuario
-            function cargarDirecciones() {
-                $.get('api/direcciones.php', function(response) {
-                    const container = $('#direccionesContainer');
-                    container.empty();
-
-                    if (!response.direcciones || response.direcciones.length === 0) {
-                        container.html('<p>No tienes direcciones guardadas.</p>');
-                        return;
-                    }
-
-                    response.direcciones.forEach(dir => {
-                        const card = `
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="direccion" 
-                                               value="${dir.id}" id="dir${dir.id}"
-                                               ${dir.es_principal ? 'checked' : ''}>
-                                        <label class="form-check-label" for="dir${dir.id}">
-                                            ${dir.calle} ${dir.numero_ext}
-                                            ${dir.numero_int ? ', Int. ' + dir.numero_int : ''}<br>
-                                            ${dir.colonia}, ${dir.ciudad}, ${dir.estado}<br>
-                                            CP: ${dir.codigo_postal}<br>
-                                            Tel: ${dir.telefono}
-                                            ${dir.es_principal ? '<span class="badge bg-primary ms-2">Principal</span>' : ''}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        container.append(card);
-                    });
-
-                    // Actualizar dirección seleccionada
-                    direccionSeleccionada = $('input[name="direccion"]:checked').val();
-                });
-            }
-
-            // Cargar resumen del carrito
-            function cargarResumen() {
-                $.get('api/carrito.php', function(response) {
-                    const tbody = $('#resumenItems');
-                    tbody.empty();
-                    let total = 0;
-
-                    response.carrito.forEach(item => {
-                        const subtotal = item.precio * item.cantidad;
-                        total += subtotal;
-                        tbody.append(`
-                            <tr>
-                                <td>${item.nombre}</td>
-                                <td class="text-end">${item.cantidad}x</td>
-                                <td class="text-end">$${subtotal.toFixed(2)}</td>
-                            </tr>
-                        `);
-                    });
-
-                    $('#resumenTotal').text('$' + total.toFixed(2));
-                });
-            }
-
-            // Guardar nueva dirección
-            $('#guardarDireccion').click(function() {
-                const direccionData = {
-                    calle: $('#calle').val(),
-                    numero_ext: $('#numeroExt').val(),
-                    numero_int: $('#numeroInt').val(),
-                    colonia: $('#colonia').val(),
-                    ciudad: $('#ciudad').val(),
-                    estado: $('#estado').val(),
-                    codigo_postal: $('#codigoPostal').val(),
-                    telefono: $('#telefono').val(),
-                    instrucciones_entrega: $('#instrucciones').val(),
-                    es_principal: $('#esPrincipal').is(':checked')
-                };
-
-                $.ajax({
-                    url: 'api/direcciones.php',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(direccionData),
-                    success: function(response) {
-                        if (response.success) {
-                            $('#nuevaDireccionModal').modal('hide');
-                            cargarDirecciones();
-                            $('#nuevaDireccionForm')[0].reset();
-                        } else {
-                            alert(response.error || 'Error al guardar la dirección');
-                        }
-                    },
-                    error: function() {
-                        alert('Error al guardar la dirección');
-                    }
-                });
-            });
-
-            // Confirmar pedido
-            $('#btnConfirmarPedido').click(function() {
-                if (!direccionSeleccionada) {
-                    alert('Por favor, selecciona una dirección de envío');
-                    return;
-                }
-
-                const metodoPago = $('input[name="metodoPago"]:checked').val();
-                const pedidoData = {
-                    direccion_id: direccionSeleccionada,
-                    metodo_pago: metodoPago
-                };
-
-                $.ajax({
-                    url: 'api/pedidos.php',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(pedidoData),
-                    success: function(response) {
-                        if (response.success) {
-                            alert('¡Pedido realizado con éxito!');
-                            window.location.href = 'cliente/historial.html';
-                        } else {
-                            alert(response.error || 'Error al procesar el pedido');
-                        }
-                    },
-                    error: function() {
-                        alert('Error al procesar el pedido');
-                    }
-                });
-            });
-
-            // Event Listeners
-            $(document).on('change', 'input[name="direccion"]', function() {
-                direccionSeleccionada = $(this).val();
-            });
-
-            // Inicialización
-            cargarDirecciones();
-            cargarResumen();
-        });
-    </script>
 </body>
 </html>

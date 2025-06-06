@@ -112,7 +112,6 @@ switch ($metodo) {
         break;
 
     case 'GET':
-
         // Endpoint para productos más vendidos
         if (isset($_GET['accion']) && $_GET['accion'] === 'masvendidos') {
             $sql = "SELECT p.id, p.nombre, SUM(dp.cantidad) as cantidad_vendida

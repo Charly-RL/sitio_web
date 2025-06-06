@@ -7,20 +7,15 @@ header('Access-Control-Allow-Headers: Content-Type');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// Verificar si el usuario está autenticado
-if (!estaAutenticado()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Usuario no autenticado']);
-    exit;
-}
 
 $conexion = conectarDB();
 $usuario_id = $_SESSION['usuario_id'];
 $metodo = $_SERVER['REQUEST_METHOD'];
+$data = json_decode(file_get_contents('php://input'), true);
 
 switch ($metodo) {
     case 'POST':
-        $data = json_decode(file_get_contents('php://input'), true);
+        //$data = json_decode(file_get_contents('php://input'), true);
         
         // Verificar dirección y método de pago
         if (!isset($data['direccion_id'])) {

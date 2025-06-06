@@ -202,6 +202,47 @@ switch ($metodo) {
 
         echo json_encode(['pedidos' => $pedidos]);
         break;
+    case 'PUT':
+        $data = json_decode(file_get_contents('php://input'), true);
+        // Actualizar estado de un pedido
+        if (!isset($data['id']) || !isset($data['estado'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID de pedido o estado no especificado']);
+            exit;
+        }
+
+        $pedido_id = (int)$data['id'];
+        $nuevo_estado = $data['estado'];
+
+        // Validar estado
+        $estados_validos = ['pendiente', 'enviado', 'entregado', 'procesando'];
+        if (!in_array($nuevo_estado, $estados_validos)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Estado no válido']);
+            exit;
+        }
+
+        // Verificar que el pedido pertenezca al usuario
+        $stmt = $conexion->prepare("SELECT id FROM pedidos WHERE id = ? AND usuario_id = ?");
+        $stmt->bind_param("ii", $pedido_id, $usuario_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows === 0) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Pedido no encontrado o no autorizado']);
+            exit;
+        }
+
+        // Actualizar estado del pedido
+        $stmt = $conexion->prepare("UPDATE pedidos SET estado = ? WHERE id = ?");
+        $stmt->bind_param("si", $nuevo_estado, $pedido_id);
+        
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al actualizar el pedido']);
+        }
+        break;
 
     default:
         http_response_code(405);

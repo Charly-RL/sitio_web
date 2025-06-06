@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración de Administración</title>
+
+  <!-- librerías externas -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- estilos personalizados -->
+  <link rel="stylesheet" href="js/admin.css">
+  <style>
+    .admin-container {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.7s cubic-bezier(.4, 2, .6, 1) 0.1s forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .sidebar-admin {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100vh;
+      z-index: 1040;
+      transition: left 0.3s;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-admin.show {
+      left: 0;
+    }
+
+    .sidebar-admin .nav-link.active,
+    .sidebar-admin .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar-admin {
+        width: 80vw;
+        min-width: 180px;
+      }
+    }
+    .logo{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+
+  <!-- scripts personalizados -->
+  <script src="js/sidebar.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Verificar si el usuario es administrador
+      $.get('../api/auth.php?accion=verificar', function(response) {
+        if (!response.autenticado || !response.es_admin) {
+            window.location.href = '../auth/login.html';
+        }
+      });
+
+      // Función para cargar los pedidos
+      function cargarPedidos() {
+
+        $.get('../api/pedidos.php?todos=1', function(response) {
+          const tbody = $('tbody');
+          tbody.empty();
+
+          if (!response.pedidos || response.pedidos.length === 0) {
+            tbody.html('<tr><td colspan="8" class="text-center">No hay pedidos registrados</td></tr>');
+            return;
+          }
+          response.pedidos.forEach(pedido => {
+            const estadoClass = {
+              'pendiente': 'warning',
+              'procesando': 'info',
+              'enviado': 'primary',
+              'entregado': 'success'
+            }[pedido.estado] || 'secondary';
+
+            const row = `
+              <tr>
+                <td>#${pedido.id}</td>
+                <td>${pedido.usuario_id}</td>
+                <td>${new Date(pedido.fecha_pedido).toLocaleString()}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary" 
+                          onclick="verDetallesPedido(${pedido.id})">
+                    Ver Productos
+                  </button>
+                </td>
+                <td>$${parseFloat(pedido.total).toFixed(2)}</td>
+                <td>${pedido.metodo_pago}</td>
+                <td>
+                  <span class="badge bg-${estadoClass}">
+                    ${pedido.estado}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" 
+                            onclick="cambiarEstado(${pedido.id}, '${pedido.estado}')">
+                      <i class="bi bi-arrow-clockwise"></i> Cambiar Estado
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" 
+                            onclick="verDireccion(${pedido.usuario_id})">
+                      <i class="bi bi-geo-alt"></i> Ver Dirección
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+            tbody.append(row);
+          });
+        });
+      }
+
+      // Función para ver detalles del pedido
+      window.verDetallesPedido = function(id) {
+        $.get(`../api/pedidos.php?id=${id}`, function(response) {
+          let detalles = "";
+          let total = 0;
+
+          response.pedidos.forEach(item => {
+            detalles += `
+              <tr>
+                <td>${item.productos}</td>
+              </tr>
+            `;
+            total += parseFloat(item.subtotal);
+          });
+
+          const modalContent = `
+            <div class="modal fade" id="detallesPedidoModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Detalles del Pedido #${id}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Productos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${detalles}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Remover modal anterior si existe
+          $('#detallesPedidoModal').remove();
+          // Agregar nuevo modal y mostrarlo
+          $('body').append(modalContent);
+          $('#detallesPedidoModal').modal('show');
+        });
+      };
+
+      // Función para cambiar el estado del pedido
+      window.cambiarEstado = function(id, estadoActual) {
+        const estados = ['pendiente', 'procesando', 'enviado', 'entregado'];
+        const modalContent = `
+          <div class="modal fade" id="cambiarEstadoModal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Cambiar Estado del Pedido #${id}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <select class="form-select" id="nuevoEstado">
+                    ${estados.map(estado => `
+                      <option value="${estado}" ${estado === estadoActual ? 'selected' : ''}>
+                        ${estado.charAt(0).toUpperCase() + estado.slice(1)}
+                      </option>
+                    `).join('')}
+                  </select>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" onclick="guardarEstado(${id})">
+                    Guardar Cambios
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Remover modal anterior si existe
+        $('#cambiarEstadoModal').remove();
+        // Agregar nuevo modal y mostrarlo
+        $('body').append(modalContent);
+        $('#cambiarEstadoModal').modal('show');
+      };
+
+      // Función para guardar el nuevo estado
+      window.guardarEstado = function(id) {
+        const nuevoEstado = $('#nuevoEstado').val();
+        
+        $.ajax({
+          url: '../api/pedidos.php',
+          type: 'PUT',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            id: id,
+            estado: nuevoEstado
+          }),
+          success: function(response) {
+            if (response.success) {
+              $('#cambiarEstadoModal').modal('hide');
+              cargarPedidos();
+            } else {
+              alert(response.error || 'Error al actualizar el estado');
+            }
+          },
+          error: function() {
+            alert('Error al actualizar el estado');
+          }
+        });
+      };
+
+      // Función para ver la dirección de envío
+      window.verDireccion = function(usuario_id) {
+        $.get(`../api/direcciones.php?usuario_id=${usuario_id}`, function(response) {
+          const direccion = response.direcciones[0];
+          const modalContent = `
+            <div class="modal fade" id="direccionModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Dirección de Envío</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>Calle:</strong> ${direccion.calle} ${direccion.numero_ext}
+                       ${direccion.numero_int ? ', Int. ' + direccion.numero_int : ''}</p>
+                    <p><strong>Colonia:</strong> ${direccion.colonia}</p>
+                    <p><strong>Ciudad:</strong> ${direccion.ciudad}</p>
+                    <p><strong>Estado:</strong> ${direccion.estado}</p>
+                    <p><strong>CP:</strong> ${direccion.codigo_postal}</p>
+                    <p><strong>Teléfono:</strong> ${direccion.telefono}</p>
+                    ${direccion.instrucciones_entrega ? 
+                      `<p><strong>Instrucciones:</strong> ${direccion.instrucciones_entrega}</p>` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Remover modal anterior si existe
+          $('#direccionModal').remove();
+          // Agregar nuevo modal y mostrarlo
+          $('body').append(modalContent);
+          $('#direccionModal').modal('show');
+        });
+      };
+
+      // Cargar pedidos al iniciar
+      cargarPedidos();
+
+    });
+  </script>
+</head>
+
+<body class="bg-light">
+  <!-- navbar superior -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="../index.html">
+        <img src="../img/fondo1.jpg" class="logo">
+        Botanas Kiky
+      </a>
+    </div>
+  </nav>
+
+  <!-- barra lateral -->
+  <div id="adminSidebar" class="sidebar-admin bg-dark text-white">
+    <!-- contenido cargado dinámicamente con js -->
+  </div>
+
+  <!-- contenido principal -->
+  <div class="container admin-container mt-4">
+    <h2 class="text-primary">Gestion de Pedidos</h2>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Productos</th>
+                <th>Total</th>
+                <th>Metodo de Pago</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- contenido cargado dinámicamente con js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

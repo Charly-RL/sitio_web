@@ -150,12 +150,12 @@ switch ($metodo) {
             exit;
         }
         
-        if (!isset($data['id'])) {
+        if (!isset($_GET['id'])) {
             echo json_encode(['error' => 'ID de producto no especificado']);
             exit;
         }
         
-        $id = $conexion->real_escape_string($data['id']);
+        $id = $conexion->real_escape_string($_GET['id']);
         
         // Verificar si el producto existe y eliminar
         $stmt = $conexion->prepare("DELETE FROM productos WHERE id = ?");

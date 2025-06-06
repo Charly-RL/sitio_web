@@ -75,7 +75,7 @@
       // Función para cargar los pedidos
       function cargarPedidos() {
 
-        $.get('../api/pedidos.php?todos=1', function(response) {
+        $.get('../api/pedidos.php', function(response) {
           const tbody = $('tbody');
           tbody.empty();
 

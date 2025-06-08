@@ -59,6 +59,27 @@
       border-radius: 50%;
       object-fit: cover;
     }
+
+    /* Estilos para la tabla de pedidos */
+    .table th:nth-child(1) { width: 8%; }  /* ID Pedido */
+    .table th:nth-child(2) { width: 8%; }  /* Cliente */
+    .table th:nth-child(3) { width: 15%; } /* Fecha */
+    .table th:nth-child(4) { width: 12%; } /* Productos */
+    .table th:nth-child(5) { width: 10%; } /* Total */
+    .table th:nth-child(6) { width: 12%; } /* Método de Pago */
+    .table th:nth-child(7) { width: 15%; } /* Estado */
+    .table th:nth-child(8) { width: 80px; } /* Acciones */
+    
+    .table td:nth-child(8) .btn {
+      padding: 0.25rem;
+      min-width: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .table-responsive {
+        margin: 0 -1rem;
+      }
+    }
   </style>
 
   <!-- scripts personalizados -->
@@ -107,16 +128,15 @@
                   <span class="badge bg-${estadoClass}">
                     ${pedido.estado}
                   </span>
-                </td>
-                <td>
-                  <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-primary" 
+                </td>                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <button class="btn btn-sm btn-outline-primary w-100" 
                             onclick="cambiarEstado(${pedido.id}, '${pedido.estado}')">
-                      <i class="bi bi-arrow-clockwise"></i> Cambiar Estado
+                      <i class="bi bi-arrow-clockwise"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-info" 
+                    <button class="btn btn-sm btn-outline-info w-100" 
                             onclick="verDireccion(${pedido.usuario_id})">
-                      <i class="bi bi-geo-alt"></i> Ver Dirección
+                      <i class="bi bi-geo-alt"></i>
                     </button>
                   </div>
                 </td>

@@ -14,24 +14,13 @@ if (!estaAutenticado()) {
 }
 
 $conexion = conectarDB();
-$data = json_decode(file_get_contents('php://input'), true);
-echo json_encode($data);
 
-if (!isset($data['usuario_id'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'ID de usuario no proporcionado']);
-    exit;
-}
-if ($_REQUEST_METHOD !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método no permitido']);
-    exit;
-}
+$usuario_id = $_POST['usuario_id'];
 
 $sql="SELECT * FROM direcciones WHERE usuario_id = ?";
 
 $stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $data['usuario_id']);
+$stmt->bind_param("i", $usuario_id);
 $result = $stmt->execute();
 
 if ($result) {

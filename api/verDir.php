@@ -16,6 +16,17 @@ if (!estaAutenticado()) {
 $conexion = conectarDB();
 $data = json_decode(file_get_contents('php://input'), true);
 
+if (!isset($data['usuario_id'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'ID de usuario no proporcionado']);
+    exit;
+}
+if ($_REQUEST_METHOD !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Método no permitido']);
+    exit;
+}
+
 $sql="SELECT * FROM direcciones WHERE usuario_id = ?";
 
 $stmt = $conexion->prepare($sql);
@@ -30,7 +41,7 @@ if ($result) {
         $direcciones[] = $row;
     }
     
-    echo json_encode(['direcciones' => $direcciones]);
+    echo json_encode(['direccion' => $direcciones]);
 } else {
     http_response_code(500);
     echo json_encode(['error' => 'Error al obtener las direcciones']);

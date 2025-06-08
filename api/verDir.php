@@ -15,6 +15,7 @@ if (!estaAutenticado()) {
 
 $conexion = conectarDB();
 $data = json_decode(file_get_contents('php://input'), true);
+echo json_encode($data);
 
 if (!isset($data['usuario_id'])) {
     http_response_code(400);

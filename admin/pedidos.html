@@ -242,7 +242,7 @@
 
       // Función para ver la dirección de envío
       window.verDireccion = function(usuario_id) {
-        $.get(`../api/direcciones.php?usuario_id=${usuario_id}`, function(response) {
+        $.get(`../api/verDir.php`, function(response) {
           const direccion = response.direcciones[0];
           const modalContent = `
             <div class="modal fade" id="direccionModal" tabindex="-1">
@@ -253,7 +253,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
                   <div class="modal-body">
-                    <p><strong>Calle:</strong> ${direccion.calle[0]} ${direccion.numero_ext}
+                    <p><strong>Calle:</strong> ${direccion.calle} ${direccion.numero_ext}
                        ${direccion.numero_int ? ', Int. ' + direccion.numero_int : ''}</p>
                     <p><strong>Colonia:</strong> ${direccion.colonia}</p>
                     <p><strong>Ciudad:</strong> ${direccion.ciudad}</p>

@@ -1,152 +1,330 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Vendedor - Mi Tienda</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="js/seller.css">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/seller.js"></script>
-    <style>
-        .sidebar-seller {
-            position: fixed;
-            top: 0;
-            left: -260px;
-            width: 250px;
-            height: 100vh;
-            z-index: 1040;
-            transition: left 0.3s;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion de pedidos</title>
+  <link rel="stylesheet" href="../CSS/bootstrap.min.css">
+  <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/seller.js"></script>
+  <style>
+    .admin-container {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.7s cubic-bezier(.4, 2, .6, 1) 0.1s forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .sidebar-admin {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100vh;
+      z-index: 1040;
+      transition: left 0.3s;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-admin.show {
+      left: 0;
+    }
+
+    .sidebar-admin .nav-link.active,
+    .sidebar-admin .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 991.98px) {
+      .sidebar-admin {
+        width: 80vw;
+        min-width: 180px;
+      }
+    }
+    .logo{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+
+  <!-- scripts personalizados -->
+  <script>
+    $(document).ready(function () {
+      // Verificar si el usuario es administrador
+      $.get('../api/auth.php?accion=verificar', function(response) {
+        if (!response.autenticado || !response.es_admin) {
+            window.location.href = '../auth/login.html';
         }
-        .sidebar-seller.show {
-            left: 0;
-        }
-        .sidebar-seller .nav-link.active, .sidebar-seller .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        @media (max-width: 991.98px) {
-            .sidebar-seller {
-                width: 80vw;
-                min-width: 180px;
-            }
-        }
-        .logo{
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-    </style>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sellerSidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.add('show');
-            });
-        }
-        if (sidebarClose && sidebar) {
-            sidebarClose.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-            });
-        }
-        document.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
+      });
+
+      // Función para cargar los pedidos
+      function cargarPedidos() {
+
+        $.get('../api/pedidos.php', function(response) {
+          const tbody = $('tbody');
+          tbody.empty();
+
+          if (!response.pedidos || response.pedidos.length === 0) {
+            tbody.html('<tr><td colspan="8" class="text-center">No hay pedidos registrados</td></tr>');
+            return;
+          }
+          response.pedidos.forEach(pedido => {
+            const estadoClass = {
+              'pendiente': 'warning',
+              'procesando': 'info',
+              'enviado': 'primary',
+              'entregado': 'success'
+            }[pedido.estado] || 'secondary';
+
+            const row = `
+              <tr>
+                <td>#${pedido.id}</td>
+                <td>${pedido.usuario_id}</td>
+                <td>${new Date(pedido.fecha_pedido).toLocaleString()}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary" 
+                          onclick="verDetallesPedido(${pedido.id})">
+                    Ver Productos
+                  </button>
+                </td>
+                <td>$${parseFloat(pedido.total).toFixed(2)}</td>
+                <td>${pedido.metodo_pago}</td>
+                <td>
+                  <span class="badge bg-${estadoClass}">
+                    ${pedido.estado}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" 
+                            onclick="cambiarEstado(${pedido.id}, '${pedido.estado}')">
+                      <i class="bi bi-arrow-clockwise"></i> Cambiar Estado
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" 
+                            onclick="verDireccion(${pedido.usuario_id})">
+                      <i class="bi bi-geo-alt"></i> Ver Dirección
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+            tbody.append(row);
+          });
         });
-    });
-    </script>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
-                <i class="bi bi-list"></i>
-            </button>
-            <a class="navbar-brand" href="../index.html">
-                <img src="../img/fondo1.jpg" class="logo">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../index.html">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Panel Vendedor</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logoutBtn">Cerrar Sesión</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+      }
 
-    <!-- Sidebar -->
-    <div id="sellerSidebar" class="sidebar-seller bg-dark text-white"></div>
+      // Función para ver detalles del pedido
+      window.verDetallesPedido = function(id) {
+        $.get(`../api/pedidos.php?id=${id}`, function(response) {
+          let detalles = "";
+          let total = 0;
 
-    <div class="container admin-container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Mis Productos</h2>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Pedir Cambio</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody">
-                </tbody>
-            </table>
-        </div>
-    </div>
+          response.pedidos.forEach(item => {
+            detalles += `
+              <tr>
+                <td>${item.productos}</td>
+              </tr>
+            `;
+            total += parseFloat(item.subtotal);
+          });
 
-    <!-- Modal de Nuevo Producto -->
-
-    <!-- Modal de Petición de Cambio -->
-    <div class="modal fade" id="peticionModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Petición de Cambio de Producto</h5>
+          const modalContent = `
+            <div class="modal fade" id="detallesPedidoModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Detalles del Pedido #${id}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Productos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${detalles}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Remover modal anterior si existe
+          $('#detallesPedidoModal').remove();
+          // Agregar nuevo modal y mostrarlo
+          $('body').append(modalContent);
+          $('#detallesPedidoModal').modal('show');
+        });
+      };
+
+      // Función para cambiar el estado del pedido
+      window.cambiarEstado = function(id, estadoActual) {
+        const estados = ['pendiente', 'procesando', 'enviado', 'entregado'];
+        const modalContent = `
+          <div class="modal fade" id="cambiarEstadoModal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Cambiar Estado del Pedido #${id}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="peticionForm">
-                        <input type="hidden" id="peticionProductId">
-                        <div class="mb-3">
-                            <label for="peticionMensaje" class="form-label">Mensaje para el administrador</label>
-                            <textarea class="form-control" id="peticionMensaje" rows="4" required placeholder="Describe el cambio que solicitas..."></textarea>
-                        </div>
-                    </form>
+                  <select class="form-select" id="nuevoEstado">
+                    ${estados.map(estado => `
+                      <option value="${estado}" ${estado === estadoActual ? 'selected' : ''}>
+                        ${estado.charAt(0).toUpperCase() + estado.slice(1)}
+                      </option>
+                    `).join('')}
+                  </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="enviarPeticion">Enviar Petición</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" onclick="guardarEstado(${id})">
+                    Guardar Cambios
+                  </button>
                 </div>
+              </div>
             </div>
-        </div>
+          </div>
+        `;
+
+        // Remover modal anterior si existe
+        $('#cambiarEstadoModal').remove();
+        // Agregar nuevo modal y mostrarlo
+        $('body').append(modalContent);
+        $('#cambiarEstadoModal').modal('show');
+      };
+
+      // Función para guardar el nuevo estado
+      window.guardarEstado = function(id) {
+        const nuevoEstado = $('#nuevoEstado').val();
+        
+        $.ajax({
+          url: '../api/pedidos.php',
+          type: 'PUT',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            id: id,
+            estado: nuevoEstado
+          }),
+          success: function(response) {
+            if (response.success) {
+              $('#cambiarEstadoModal').modal('hide');
+              cargarPedidos();
+            } else {
+              alert(response.error || 'Error al actualizar el estado');
+            }
+          },
+          error: function() {
+            alert('Error al actualizar el estado');
+          }
+        });
+      };
+
+      // Función para ver la dirección de envío
+      window.verDireccion = function(usuario_id) {
+        $.post('../api/verDir.php',{usuario_id: usuario_id}, function(response) {
+          const direccion = response.direccion[0];
+          const modalContent = `
+            <div class="modal fade" id="direccionModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Dirección de Envío</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>Calle:</strong> ${direccion.calle} ${direccion.numero_ext}
+                       ${direccion.numero_int ? ', Int. ' + direccion.numero_int : ''}</p>
+                    <p><strong>Colonia:</strong> ${direccion.colonia}</p>
+                    <p><strong>Ciudad:</strong> ${direccion.ciudad}</p>
+                    <p><strong>Estado:</strong> ${direccion.estado}</p>
+                    <p><strong>CP:</strong> ${direccion.codigo_postal}</p>
+                    <p><strong>Teléfono:</strong> ${direccion.telefono}</p>
+                    ${direccion.instrucciones_entrega ? 
+                      `<p><strong>Instrucciones:</strong> ${direccion.instrucciones_entrega}</p>` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Remover modal anterior si existe
+          $('#direccionModal').remove();
+          // Agregar nuevo modal y mostrarlo
+          $('body').append(modalContent);
+          $('#direccionModal').modal('show');
+        });
+      };
+
+      // Cargar pedidos al iniciar
+      cargarPedidos();
+
+    });
+  </script>
+</head>
+
+<body class="bg-light">
+  <!-- navbar superior -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="../index.html">
+        <img src="../img/fondo1.jpg" class="logo">
+        Botanas Kiky
+      </a>
     </div>
+  </nav>
+
+  <!-- barra lateral -->
+  <div id="adminSidebar" class="sidebar-admin bg-dark text-white">
+    <!-- contenido cargado dinámicamente con js -->
+  </div>  <!-- contenido principal -->
+  <div class="container admin-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Gestión de Pedidos</h2>
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div class="table-responsive">
+      <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Productos</th>
+                <th>Total</th>
+                <th>Método de Pago</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- contenido cargado dinámicamente con js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -62,9 +62,9 @@
   <!-- scripts personalizados -->
   <script>
     $(document).ready(function () {
-      // Verificar si el usuario es administrador
+      // Verificar si el usuario es vendedor
       $.get('../api/auth.php?accion=verificar', function(response) {
-        if (!response.autenticado || !response.es_admin) {
+        if (!response.autenticado || response.tipo !== 'vendedor') {
             window.location.href = '../auth/login.html';
         }
       });

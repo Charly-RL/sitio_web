@@ -90,9 +90,14 @@
         }
 
         $(function() {
-            // Reporte de ventas por producto
+            // Reporte de ventas por producto con filtro de fechas
             $('#btnReporteVentas').click(() => {
-                $.get('../api/pedidos.php?accion=masvendidos', function(response) {
+                const inicio = $('#fechaInicio').val();
+                const fin = $('#fechaFin').val();
+                let url = '../api/pedidos.php?accion=masvendidos';
+                if (inicio) url += `&inicio=${encodeURIComponent(inicio)}`;
+                if (fin) url += `&fin=${encodeURIComponent(fin)}`;
+                $.get(url, function(response) {
                     const cabeceras = ['Producto', 'Vendidos'];
                     const filas = (response.productos || []).map(p => [p.nombre, p.cantidad_vendida]);
                     descargarCSV('ventas_productos.csv', cabeceras, filas);
@@ -147,6 +152,14 @@
                     </div>
                     <div class="card-body">
                         <p>Descarga un reporte de ventas por producto en formato CSV.</p>
+                        <div class="mb-2">
+                            <label for="fechaInicio" class="form-label">Desde:</label>
+                            <input type="date" class="form-control" id="fechaInicio">
+                        </div>
+                        <div class="mb-2">
+                            <label for="fechaFin" class="form-label">Hasta:</label>
+                            <input type="date" class="form-control" id="fechaFin">
+                        </div>
                         <button class="btn btn-outline-primary w-100" id="btnReporteVentas">
                             <i class="bi bi-download"></i> Descargar
                         </button>

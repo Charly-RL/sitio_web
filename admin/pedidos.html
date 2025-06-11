@@ -62,6 +62,20 @@
   <!-- scripts personalizados -->
   <script>
     $(document).ready(function () {
+      // Función para ajustar la zona horaria (restar 6 horas)
+      function ajustarFecha(fecha) {
+        const date = new Date(fecha);
+        date.setHours(date.getHours() - 6);
+        return date.toLocaleString('es-MX', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
+
       // Verificar si el usuario es administrador
       $.get('../api/auth.php?accion=verificar', function(response) {
         if (!response.autenticado || !response.es_admin) {
@@ -92,8 +106,7 @@
               <tr>
                 <td>#${pedido.id}</td>
                 <td>${pedido.usuario_id}</td>
-                <td>${pedido.fecha_pedido}</td>
-                <!-- <td>${new Date(pedido.fecha_pedido).toLocaleString()}</td>-->
+                <td>${ajustarFecha(pedido.fecha_pedido)}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary" 
                           onclick="verDetallesPedido(${pedido.id})">

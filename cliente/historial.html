@@ -23,6 +23,20 @@
     </style>
     <script>
         $(document).ready(function() {
+            // Función para ajustar la zona horaria (restar 6 horas)
+            function ajustarFecha(fecha) {
+                const date = new Date(fecha);
+                date.setHours(date.getHours() - 6);
+                return date.toLocaleString('es-MX', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+
             // Verificar si el usuario está autenticado
             $.get('../api/auth.php?accion=verificar', function(response) {
                 if (!response.autenticado) {
@@ -57,7 +71,7 @@
                                         <h5 class="card-title">Pedido #${pedido.id}</h5>
                                         <p class="card-text">
                                             <strong>Productos:</strong> ${pedido.productos}<br>
-                                            <strong>Fecha:</strong> ${new Date(pedido.fecha_pedido).toLocaleDateString()}<br>
+                                            <strong>Fecha:</strong> ${ajustarFecha(pedido.fecha_pedido)}<br>
                                             <strong>Total:</strong> $${pedido.total}
                                         </p>
                                         <button class="btn btn-primary btn-sm" 

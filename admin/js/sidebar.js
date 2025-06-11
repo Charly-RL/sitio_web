@@ -13,8 +13,7 @@ function loadSidebar(activePage) {
         </li>
         <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='usuarios' ? ' active' : ''}" href="usuarios.html"><i class="bi bi-people me-2"></i>Usuarios</a>
-        </li>
-        
+        </li>  
         <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='reportes' ? ' active' : ''}" href="reportes.html"><i class="bi bi-bar-chart me-2"></i>Reportes</a>
         </li>

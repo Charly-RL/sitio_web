@@ -199,12 +199,13 @@ switch ($metodo) {
 
         // Obtener pedidos: admin ve todos, usuario solo los suyos
         if (function_exists('esAdmin') && esAdmin() || function_exists('esRepartidor') && esRepartidor()) {
-            // Si es admin o repartidor, obtener todos los pedidos
-            $sql = "SELECT p.*, 
+            // Si es admin o repartidor, obtener todos los pedidos, incluyendo el nombre del cliente
+            $sql = "SELECT p.*, u.nombre AS cliente_nombre, 
                     GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                     FROM pedidos p
                     JOIN detalles_pedido dp ON p.id = dp.pedido_id
                     JOIN productos pr ON dp.producto_id = pr.id
+                    JOIN usuarios u ON p.usuario_id = u.id
                     GROUP BY p.id
                     ORDER BY p.fecha_pedido DESC";
             $stmt = $conexion->prepare($sql);

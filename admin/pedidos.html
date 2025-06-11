@@ -102,10 +102,13 @@
               'entregado': 'success'
             }[pedido.estado] || 'secondary';
 
+            // Mostrar el nombre del cliente si está disponible, si no, mostrar el ID
+            const cliente = pedido.cliente_nombre ? pedido.cliente_nombre : pedido.usuario_id;
+
             const row = `
               <tr>
                 <td>#${pedido.id}</td>
-                <td>${pedido.usuario_id}</td>
+                <td>${cliente}</td>
                 <td>${ajustarFecha(pedido.fecha_pedido)}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary" 

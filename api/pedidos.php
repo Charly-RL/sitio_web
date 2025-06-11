@@ -246,7 +246,7 @@ switch ($metodo) {
                     GROUP BY p.id
                     ORDER BY p.fecha_pedido DESC";
             $stmt = $conexion->prepare($sql);
-        } else {
+        } else if ($_GET['accion'] === 'historial') {
             $sql = "SELECT p.*, 
                     GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                     FROM pedidos p

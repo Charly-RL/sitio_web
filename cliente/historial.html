@@ -46,7 +46,7 @@
 
             // Cargar pedidos
             function cargarPedidos() {
-                $.get('../api/pedidos.php', function(response) {
+                $.get('../api/pedidos.php?accion=historial', function(response) {
                     const container = $('#pedidosContainer');
                     $('#loadingPedidos').remove();
                     

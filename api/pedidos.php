@@ -107,6 +107,43 @@ switch ($metodo) {
         break;
 
     case 'GET':
+        // Endpoint para detalles de un pedido específico (solo el cliente dueño o admin/repartidor pueden ver)
+        if (isset($_GET['id'])) {
+            $pedido_id = intval($_GET['id']);
+            $es_admin = function_exists('esAdmin') && esAdmin();
+            $es_repartidor = function_exists('esRepartidor') && esRepartidor();
+            // Solo permitir si el pedido es del usuario autenticado o si es admin/repartidor
+            $sql = "SELECT * FROM pedidos WHERE id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param('i', $pedido_id);
+            $stmt->execute();
+            $pedido = $stmt->get_result()->fetch_assoc();
+            if (!$pedido) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Pedido no encontrado']);
+                exit;
+            }
+            if (!$es_admin && !$es_repartidor && $pedido['usuario_id'] != $usuario_id) {
+                http_response_code(403);
+                echo json_encode(['error' => 'No autorizado']);
+                exit;
+            }
+            // Obtener detalles del pedido
+            $sql = "SELECT pr.nombre AS nombre_producto, dp.cantidad, dp.precio_unitario, dp.subtotal
+                    FROM detalles_pedido dp
+                    JOIN productos pr ON dp.producto_id = pr.id
+                    WHERE dp.pedido_id = ?";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bind_param('i', $pedido_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $detalles = [];
+            while ($row = $result->fetch_assoc()) {
+                $detalles[] = $row;
+            }
+            echo json_encode(['detalles' => $detalles]);
+            break;
+        }
         // Endpoint para productos más vendidos
         if (isset($_GET['accion']) && $_GET['accion'] === 'masvendidos') {
             $where = "";

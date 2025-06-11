@@ -15,7 +15,8 @@ define('DB_NAME', 'tienda_online');*/
 function conectarDB() {
     $conexion = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     //Establecer zona horaria utc -7 en la base de datos
-    date_default_timezone_set('America/Tijuana');
+    $sql = "SET time_zone = '-07:00'";
+    $conexion->query($sql);
     // Verificar conexión
     if ($conexion->connect_error) {
         die("Error de conexión: " . $conexion->connect_error);

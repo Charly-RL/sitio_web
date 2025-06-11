@@ -113,7 +113,7 @@
             let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');
             let fechaStr = `${yyyy}-${mm}-${dd}`;
             labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());
-            data.push(mapaVentas[ajustarFecha(fechaStr)] || 0);
+            data.push(mapaVentas[fechaStr] || 0);
           }
         } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
           labels = estadisticas.ventas_por_semana.map(v => {

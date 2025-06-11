@@ -37,7 +37,7 @@ $(document).ready(function() {
         });
     }
 
-    // Elimina un usuario después de confirmar con el usuario
+    // Elimina un usuario
     window.deleteUsuario = function(id) {
         if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
             $.ajax({

@@ -109,13 +109,36 @@ switch ($metodo) {
     case 'GET':
         // Endpoint para productos más vendidos
         if (isset($_GET['accion']) && $_GET['accion'] === 'masvendidos') {
+            $where = "";
+            $params = [];
+            $types = "";
+
+            if (!empty($_GET['inicio'])) {
+                $where .= " AND peds.fecha_pedido >= ? ";
+                $params[] = $_GET['inicio'];
+                $types .= "s";
+            }
+            if (!empty($_GET['fin'])) {
+                $where .= " AND peds.fecha_pedido <= ? ";
+                $params[] = $_GET['fin'] . " 23:59:59";
+                $types .= "s";
+            }
+
             $sql = "SELECT p.id, p.nombre, SUM(dp.cantidad) as cantidad_vendida
                     FROM productos p
                     JOIN detalles_pedido dp ON p.id = dp.producto_id
+                    JOIN pedidos peds ON dp.pedido_id = peds.id
+                    WHERE 1=1 $where
                     GROUP BY p.id, p.nombre
                     ORDER BY cantidad_vendida DESC
                     LIMIT 10";
-            $result = $conexion->query($sql);
+
+            $stmt = $conexion->prepare($sql);
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             $productos = [];
             while ($row = $result->fetch_assoc()) {
                 $productos[] = $row;

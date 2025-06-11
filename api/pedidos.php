@@ -198,7 +198,8 @@ switch ($metodo) {
         }
 
         // Obtener pedidos: admin ve todos, usuario solo los suyos
-        if (function_exists('esAdmin') && esAdmin()) {
+        if (function_exists('esAdmin') && esAdmin() || function_exists('esRepartidor') && esRepartidor()) {
+            // Si es admin o repartidor, obtener todos los pedidos
             $sql = "SELECT p.*, 
                     GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                     FROM pedidos p

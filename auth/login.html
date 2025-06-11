@@ -62,7 +62,7 @@
                             $.get('../api/auth.php?accion=verificar', function(resp) {
                                 if (resp.tipo === 'admin') {
                                     window.location.href = '../admin/index.html';
-                                }else if(resp.tipo === 'vendedor') {
+                                }else if(resp.tipo === 'repartidor') {
                                     window.location.href = '../seller/index.html';
                                 } else {
                                     window.location.href = '../index.html';

@@ -64,7 +64,7 @@ function esAdmin() {
 
 // Función para verificar si el usuario es vendedor
 function esVendedor() {
-    return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'vendedor';
+    return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'repartidor';
 }
 
 // Función para cerrar sesión

@@ -109,7 +109,7 @@
           let mapaVentas = {};
           estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));
           for (let i = diasAMostrar - 1; i >= 0; i--) {
-            let fecha = ajustarFecha(hoy); fecha.setDate(hoy.getDate() - i);
+            let fecha = new Date(hoy); fecha.setDate(hoy.getDate() - i);
             let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');
             let fechaStr = `${yyyy}-${mm}-${dd}`;
             labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());

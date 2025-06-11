@@ -141,7 +141,7 @@
 
       // Función para ver detalles del pedido
       window.verDetallesPedido = function(usuario_id) {
-        $.get(`../api/pedidos.php?usuario_id=${usuario_id}`, function(response) {
+        $.post(`../api/verProd.php`,{usuario_id: usuario_id}, function(response) {
           let detalles = "";
           let total = 0;
 

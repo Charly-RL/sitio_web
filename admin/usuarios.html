@@ -26,6 +26,7 @@
             }
         }
 
+        /* Sidebar lateral para navegación de administración */
         .sidebar-admin {
             position: fixed;
             top: 0;
@@ -37,21 +38,25 @@
             box-shadow: 2px 0 8px rgba(0,0,0,0.1);
         }
 
+        /* Sidebar visible */
         .sidebar-admin.show {
             left: 0;
         }
 
+        /* Efecto visual para el enlace activo o al pasar el mouse */
         .sidebar-admin .nav-link.active,
         .sidebar-admin .nav-link:hover {
             background: rgba(255,255,255,0.1);
         }
 
+        /* Sidebar responsiva en móvil/tablet */
         @media (max-width: 991.98px) {
             .sidebar-admin {
                 width: 80vw;
                 min-width: 180px;
             }
         }
+        /* Estilo para el logo de la tienda */
         .logo{
             width: 50px;
             height: 50px;

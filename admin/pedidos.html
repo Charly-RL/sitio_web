@@ -63,6 +63,7 @@
   <script>
     $(document).ready(function () {
       // Función para ajustar la zona horaria (restar 6 horas)
+      // Ajusta la fecha a la zona horaria correcta (resta 6 horas)
       function ajustarFecha(fecha) {
         const date = new Date(fecha);
         date.setHours(date.getHours() - 6);
@@ -77,6 +78,7 @@
       }
 
       // Verificar si el usuario es administrador
+      // Verifica si el usuario es administrador antes de mostrar la página
       $.get('../api/auth.php?accion=verificar', function(response) {
         if (!response.autenticado || !response.es_admin) {
             window.location.href = '../auth/login.html';
@@ -84,16 +86,18 @@
       });
 
       // Función para cargar los pedidos
+      // Carga la lista de pedidos y los muestra en la tabla
       function cargarPedidos() {
-
         $.get('../api/pedidos.php', function(response) {
           const tbody = $('tbody');
           tbody.empty();
 
+          // Si no hay pedidos, mostrar mensaje
           if (!response.pedidos || response.pedidos.length === 0) {
             tbody.html('<tr><td colspan="8" class="text-center">No hay pedidos registrados</td></tr>');
             return;
           }
+          // Recorre cada pedido y lo agrega a la tabla
           response.pedidos.forEach(pedido => {
             const estadoClass = {
               'pendiente': 'warning',
@@ -143,11 +147,13 @@
       }
 
       // Función para ver detalles del pedido
+      // Muestra los detalles de productos de un pedido en un modal
       window.verDetallesPedido = function(id) {
         $.get(`../api/pedidos.php?id=${id}`, function(response) {
           let detalles = "";
           let total = 0;
 
+          // Si hay detalles, los muestra en la tabla
           if (response.detalles && response.detalles.length > 0) {
             response.detalles.forEach(item => {
               detalles += `
@@ -161,9 +167,11 @@
               total += parseFloat(item.subtotal);
             });
           } else {
+            // Si no hay detalles, muestra mensaje
             detalles = '<tr><td colspan="4" class="text-center">No hay detalles para este pedido</td></tr>';
           }
 
+          // Estructura del modal para mostrar los productos del pedido
           const modalContent = `
             <div class="modal fade" id="detallesPedidoModal" tabindex="-1">
               <div class="modal-dialog">
@@ -192,15 +200,15 @@
             </div>
           `;
 
-          // Remover modal anterior si existe
+          // Remueve el modal anterior si existe y muestra el nuevo
           $('#detallesPedidoModal').remove();
-          // Agregar nuevo modal y mostrarlo
           $('body').append(modalContent);
           $('#detallesPedidoModal').modal('show');
         });
       };
 
       // Función para cambiar el estado del pedido
+      // Muestra un modal para cambiar el estado del pedido
       window.cambiarEstado = function(id, estadoActual) {
         const estados = ['pendiente', 'procesando', 'enviado', 'entregado'];
         const modalContent = `
@@ -231,14 +239,14 @@
           </div>
         `;
 
-        // Remover modal anterior si existe
+        // Remueve el modal anterior si existe y muestra el nuevo
         $('#cambiarEstadoModal').remove();
-        // Agregar nuevo modal y mostrarlo
         $('body').append(modalContent);
         $('#cambiarEstadoModal').modal('show');
       };
 
       // Función para guardar el nuevo estado
+      // Envía el nuevo estado del pedido al backend y recarga la tabla
       window.guardarEstado = function(id) {
         const nuevoEstado = $('#nuevoEstado').val();
         
@@ -265,6 +273,7 @@
       };
 
       // Función para ver la dirección de envío
+      // Muestra la dirección de envío del usuario en un modal
       window.verDireccion = function(usuario_id) {
         $.post('../api/verDir.php',{usuario_id: usuario_id}, function(response) {
           const direccion = response.direccion[0];
@@ -292,15 +301,15 @@
             </div>
           `;
 
-          // Remover modal anterior si existe
+          // Remueve el modal anterior si existe y muestra el nuevo
           $('#direccionModal').remove();
-          // Agregar nuevo modal y mostrarlo
           $('body').append(modalContent);
           $('#direccionModal').modal('show');
         });
       };
 
       // Cargar pedidos al iniciar
+      // Carga los pedidos al iniciar la página
       cargarPedidos();
 
     });

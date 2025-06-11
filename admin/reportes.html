@@ -91,6 +91,7 @@
 
         $(function() {
             // Reporte de ventas por producto con filtro de fechas
+            // Descarga un CSV con los productos más vendidos en el rango de fechas seleccionado
             $('#btnReporteVentas').click(() => {
                 const inicio = $('#fechaInicio').val();
                 const fin = $('#fechaFin').val();
@@ -105,6 +106,7 @@
             });
 
             // Reporte de usuarios
+            // Descarga un CSV con todos los usuarios registrados
             $('#btnReporteUsuarios').click(() => {
                 $.get('../api/usuarios.php', function(response) {
                     const cabeceras = ['Usuario', 'Email'];
@@ -114,6 +116,7 @@
             });
 
             // Reporte de stock de productos
+            // Descarga un CSV con el stock actual de todos los productos
             $('#btnReporteStock').click(() => {
                 $.get('../api/productos.php', function(response) {
                     const cabeceras = ['Producto', 'Stock'];

@@ -66,14 +66,17 @@
         }
   </style>
   <script>
+    // Lógica para mostrar/ocultar la barra lateral (sidebar) en dispositivos móviles
     document.addEventListener('DOMContentLoaded', function () {
       const sidebar = document.getElementById('adminSidebar');
       const sidebarToggle = document.getElementById('sidebarToggle');
+      // Cierra la sidebar si se hace clic fuera de ella
       document.addEventListener('click', function (e) {
         if (sidebar.classList.contains('show') && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
           sidebar.classList.remove('show');
         }
       });
+      // Abre la sidebar al hacer clic en el botón
       if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', function () {
           sidebar.classList.add('show');
@@ -82,6 +85,7 @@
     });
 
     $(function () {
+      // Ajusta la fecha a la zona horaria correcta (resta 6 horas)
       function ajustarFecha(fecha) {
         const date = new Date(fecha);
         date.setHours(date.getHours() - 6);
@@ -94,19 +98,25 @@
           hour12: true
         });
       }
+
+      // Variables globales para almacenar datos y la instancia de la gráfica
       let estadisticas = null;
       let chart = null;
+      // Nombres de los días y meses para mostrar en la gráfica
       const diasSemana = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
       const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
+      // Renderiza la gráfica de ventas según el tipo seleccionado (día, semana, mes)
       function renderGrafica(tipo) {
         if (!estadisticas) return;
         let labels = [], data = [];
 
+        // Gráfica por día: muestra los últimos 7 días
         if (tipo === 'dia' && estadisticas.ventas_por_dia) {
           let diasAMostrar = 7;
           let hoy = new Date(); hoy.setHours(0,0,0,0);
           let mapaVentas = {};
+          // Crea un mapa de fecha a total vendido
           estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));
           for (let i = diasAMostrar - 1; i >= 0; i--) {
             let fecha = new Date(hoy); fecha.setDate(hoy.getDate() - i);
@@ -115,17 +125,20 @@
             labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());
             data.push(mapaVentas[fechaStr] || 0);
           }
+        // Gráfica por semana: muestra las últimas 8 semanas
         } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
           labels = estadisticas.ventas_por_semana.map(v => {
             const fecha = new Date(v.inicio_semana);
             return 'Semana ' + v.semana + ' (' + fecha.toLocaleDateString('es-MX') + ')';
           });
           data = estadisticas.ventas_por_semana.map(v => Number(v.total));
+        // Gráfica por mes: muestra los últimos 12 meses
         } else if (tipo === 'mes' && estadisticas.ventas_por_mes) {
           labels = estadisticas.ventas_por_mes.map(v => meses[parseInt(v.mes)-1] + ' ' + v.anio);
           data = estadisticas.ventas_por_mes.map(v => Number(v.total));
         }
 
+        // Destruye la gráfica anterior si existe para evitar superposición
         if (chart) chart.destroy();
         const ctx = document.getElementById('ventasMesChart').getContext('2d');
         chart = new Chart(ctx, {
@@ -142,14 +155,17 @@
         });
       }
 
+      // Carga las estadísticas de ventas desde el backend y actualiza la UI
       function cargarEstadisticas() {
-        const tipo = $('#selectTipoGrafica').val();
-        const anio = $('#inputAnio').val();
+        const tipo = $('#selectTipoGrafica').val(); // día, semana o mes
+        const anio = $('#inputAnio').val(); // año seleccionado
         let url = '../api/pedidos.php?accion=estadisticas';
         if (anio) url += `&anio=${anio}`;
+        // Solicita los datos al backend
         $.get(url, function(response) {
           if (response.success) {
             estadisticas = response;
+            // Actualiza los totales en las tarjetas
             $('#statTotalVentas').text(`$${Number(response.total_ventas).toLocaleString('es-MX', {minimumFractionDigits:2})}`);
             $('#statPedidos').text(response.total_pedidos);
             renderGrafica(tipo);
@@ -157,16 +173,20 @@
         });
       }
 
+      // Inicializa el año actual en el input y carga las estadísticas al iniciar
       $('#inputAnio').val(new Date().getFullYear());
       cargarEstadisticas();
+      // Recarga estadísticas al cambiar el tipo de gráfica o el año
       $('#selectTipoGrafica, #inputAnio').on('change', cargarEstadisticas);
 
+      // Carga el número total de clientes
       $.get('../api/usuarios.php', function(response) {
         if (response.usuarios) {
           $('#statClientes').text(response.usuarios.length);
         }
       });
 
+      // Carga el top de productos más vendidos
       $.get('../api/pedidos.php?accion=masvendidos', function(response) {
         const tbody = $('#tablaTopProductos tbody');
         tbody.empty();

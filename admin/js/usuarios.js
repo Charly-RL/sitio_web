@@ -1,17 +1,19 @@
 // usuarios.js - Lógica para mostrar y editar usuarios
 $(document).ready(function() {
-    // Verificar si el usuario es administrador
+
+    // Verifica si el usuario es administrador antes de mostrar la página
     $.get('../api/auth.php?accion=verificar', function(response) {
         if (!response.autenticado || !response.es_admin) {
             window.location.href = '../auth/login.html';
         }
     });
 
-    // Cargar usuarios
+    // Carga la lista de usuarios y los muestra en la tabla
     function loadUsuarios() {
         $.get('../api/usuarios.php', function(response) {
             const tableBody = $('#usuariosTableBody');
             tableBody.empty();
+            // Por cada usuario recibido, crea una fila en la tabla
             response.usuarios.forEach(usuario => {
                 const row = `
                     <tr>
@@ -32,7 +34,10 @@ $(document).ready(function() {
                 `;
                 tableBody.append(row);
             });
-    // Eliminar usuario
+        });
+    }
+
+    // Elimina un usuario después de confirmar con el usuario
     window.deleteUsuario = function(id) {
         if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
             $.ajax({
@@ -52,24 +57,25 @@ $(document).ready(function() {
             });
         }
     }
-        });
-    }
 
-    // Editar usuario
+
+    // Abre el modal de edición y carga los datos del usuario seleccionado
     window.editUsuario = function(id) {
         $.get(`../api/usuarios.php?id=${id}`, function(response) {
             const usuario = response.usuarios[0];
+            // Llena el formulario de edición con los datos del usuario
             $('#editUsuarioId').val(usuario.id);
             $('#editNombre').val(usuario.nombre);
             $('#editEmail').val(usuario.email);
             $('#editTipo').val(usuario.tipo);
-            // Mostrar el modal correctamente con Bootstrap 5
+            // Muestra el modal correctamente con Bootstrap 5
             const modal = new bootstrap.Modal(document.getElementById('editUsuarioModal'), {backdrop: false});
             modal.show();
         });
     }
 
-    // Guardar cambios de edición
+
+    // Guarda los cambios realizados en la edición de un usuario
     $('#saveEditUsuario').click(function() {
         const id = $('#editUsuarioId').val();
         const usuarioData = {
@@ -77,6 +83,7 @@ $(document).ready(function() {
             email: $('#editEmail').val(),
             tipo: $('#editTipo').val()
         };
+        // Envía los datos modificados al backend para actualizar el usuario
         $.ajax({
             url: `../api/usuarios.php?id=${id}`,
             type: 'PUT',
@@ -97,6 +104,7 @@ $(document).ready(function() {
         });
     });
 
-    // Inicialización
+
+    // Inicializa la carga de usuarios al abrir la página
     loadUsuarios();
 });

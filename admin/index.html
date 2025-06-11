@@ -61,19 +61,24 @@
         }
     </style>
     <script>
+        // Lógica para mostrar/ocultar la barra lateral (sidebar) en dispositivos móviles y escritorio
         document.addEventListener('DOMContentLoaded', function () {
+            // Obtiene los elementos de la barra lateral y los botones de abrir/cerrar
             const sidebar = document.getElementById('adminSidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebarClose = document.getElementById('sidebarClose');
 
+            // Abre la sidebar al hacer clic en el botón de menú
             if (sidebarToggle && sidebar) {
                 sidebarToggle.addEventListener('click', () => sidebar.classList.add('show'));
             }
 
+            // Cierra la sidebar al hacer clic en el botón de cerrar (si existe)
             if (sidebarClose && sidebar) {
                 sidebarClose.addEventListener('click', () => sidebar.classList.remove('show'));
             }
 
+            // Cierra la sidebar si se hace clic fuera de ella (en móvil/tablet)
             document.addEventListener('click', function (e) {
                 if (sidebar.classList.contains('show') &&
                     !sidebar.contains(e.target) &&

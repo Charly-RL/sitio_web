@@ -75,22 +75,27 @@
     <div class="container admin-container mt-4">
         <h2>Recomendaciones</h2>
         <ul class="nav nav-tabs mb-3" id="recomendacionesTabs" role="tablist">
+            <!-- Pestañas de navegación para las diferentes recomendaciones -->
             <li class="nav-item" role="presentation">
+                <!-- Tab de productos con stock crítico o bajo -->
                 <button class="nav-link active" id="tab-stock" data-bs-toggle="tab" data-bs-target="#panel-stock" type="button" role="tab" aria-controls="panel-stock" aria-selected="true">
                     <i class="bi bi-exclamation-triangle"></i> Stock Crítico/Bajo
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <!-- Tab de sugerencias de oferta -->
                 <button class="nav-link" id="tab-ofertas" data-bs-toggle="tab" data-bs-target="#panel-ofertas" type="button" role="tab" aria-controls="panel-ofertas" aria-selected="false">
                     <i class="bi bi-tags"></i> Sugerencia de Oferta
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <!-- Tab de productos más vendidos -->
                 <button class="nav-link" id="tab-masvendidos" data-bs-toggle="tab" data-bs-target="#panel-masvendidos" type="button" role="tab" aria-controls="panel-masvendidos" aria-selected="false">
                     <i class="bi bi-star-fill"></i> Más Vendidos
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <!-- Tab para pedir productos al proveedor -->
                 <button class="nav-link" id="tab-pedir" data-bs-toggle="tab" data-bs-target="#panel-pedir" type="button" role="tab" aria-controls="panel-pedir" aria-selected="false">
                     <i class="bi bi-truck"></i> Pedir al Proveedor
                 </button>
@@ -98,45 +103,53 @@
         </ul>
 
         <div class="tab-content" id="recomendacionesTabContent">
+            <!-- Panel de productos con stock crítico o bajo -->
             <div class="tab-pane fade show active" id="panel-stock" role="tabpanel" aria-labelledby="tab-stock" tabindex="0">
                 <div class="card h-100 mb-3">
                     <div class="card-header bg-danger text-white">
                         <i class="bi bi-exclamation-triangle"></i> Stock Crítico/Bajo
                     </div>
                     <div class="card-body" id="recomendacionesStock">
+                        <!-- Aquí se mostrarán los productos con stock bajo -->
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Panel de sugerencias de oferta -->
             <div class="tab-pane fade" id="panel-ofertas" role="tabpanel" aria-labelledby="tab-ofertas" tabindex="0">
                 <div class="card h-100 mb-3">
                     <div class="card-header bg-primary text-white">
                         <i class="bi bi-tags"></i> Sugerencia de Oferta
                     </div>
                     <div class="card-body" id="recomendacionesOfertas">
+                        <!-- Aquí se mostrarán las sugerencias de oferta -->
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Panel de productos más vendidos -->
             <div class="tab-pane fade" id="panel-masvendidos" role="tabpanel" aria-labelledby="tab-masvendidos" tabindex="0">
                 <div class="card h-100 mb-3">
                     <div class="card-header bg-success text-white">
                         <i class="bi bi-star-fill"></i> Más Vendidos
                     </div>
                     <div class="card-body" id="recomendacionesMasVendidos">
+                        <!-- Aquí se mostrarán los productos más vendidos -->
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Panel para pedir productos al proveedor -->
             <div class="tab-pane fade" id="panel-pedir" role="tabpanel" aria-labelledby="tab-pedir" tabindex="0">
                 <div class="card h-100 mb-3">
                     <div class="card-header bg-warning text-dark">
                         <i class="bi bi-truck"></i> Pedir al Proveedor
                     </div>
                     <div class="card-body" id="recomendacionesPedir">
+                        <!-- Aquí se mostrarán las recomendaciones para pedir al proveedor -->
                         <div class="text-center text-muted">Cargando...</div>
                     </div>
                 </div>

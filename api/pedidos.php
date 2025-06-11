@@ -9,8 +9,7 @@ require_once __DIR__ . '/../includes/auth.php';
 
 
 $conexion = conectarDB();
-$usuario_id = $_POST['usuario_id'] ?? null;
-//$usuario_id = $_SESSION['usuario_id'];
+$usuario_id = $_SESSION['usuario_id'];
 $metodo = $_SERVER['REQUEST_METHOD'];
 $data = json_decode(file_get_contents('php://input'), true);
 

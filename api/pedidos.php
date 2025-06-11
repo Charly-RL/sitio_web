@@ -235,7 +235,7 @@ switch ($metodo) {
         }
 
         // Obtener pedidos: admin ve todos, usuario solo los suyos
-        if (function_exists('esAdmin') && esAdmin() || function_exists('esRepartidor') && esRepartidor()) {
+        if (function_exists('esAdmin') && esAdmin() || function_exists('esRepartidor') && esRepartidor() && !isset($_GET['accion'])) {
             // Si es admin o repartidor, obtener todos los pedidos, incluyendo el nombre del cliente
             $sql = "SELECT p.*, u.nombre AS cliente_nombre, 
                     GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos

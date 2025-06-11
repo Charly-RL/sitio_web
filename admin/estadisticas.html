@@ -107,7 +107,7 @@
           let diasAMostrar = 7;
           let hoy = new Date(); hoy.setHours(0,0,0,0);
           let mapaVentas = {};
-          estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));
+          estadisticas.ventas_por_dia.forEach(v => mapaVentas[ajustarFecha(v.dia)] = Number(v.total));
           for (let i = diasAMostrar - 1; i >= 0; i--) {
             let fecha = new Date(hoy); fecha.setDate(hoy.getDate() - i);
             let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');

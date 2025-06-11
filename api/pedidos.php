@@ -250,8 +250,8 @@ switch ($metodo) {
         }
 
         // Verificar que el pedido pertenezca al usuario
-        $stmt = $conexion->prepare("SELECT id FROM pedidos WHERE id = ? AND usuario_id = ?");
-        $stmt->bind_param("ii", $pedido_id, $usuario_id);
+        $stmt = $conexion->prepare("SELECT id FROM pedidos WHERE id = ?");
+        $stmt->bind_param("i", $pedido_id);
         $stmt->execute();
         if ($stmt->get_result()->num_rows === 0) {
             http_response_code(403);

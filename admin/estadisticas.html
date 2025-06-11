@@ -82,6 +82,18 @@
     });
 
     $(function () {
+      function ajustarFecha(fecha) {
+        const date = new Date(fecha);
+        date.setHours(date.getHours() - 6);
+        return date.toLocaleString('es-MX', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
       let estadisticas = null;
       let chart = null;
       const diasSemana = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -101,7 +113,7 @@
             let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');
             let fechaStr = `${yyyy}-${mm}-${dd}`;
             labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());
-            data.push(mapaVentas[fechaStr] || 0);
+            data.push(mapaVentas[ajustarFecha(fechaStr)] || 0);
           }
         } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
           labels = estadisticas.ventas_por_semana.map(v => {

@@ -93,7 +93,7 @@
     $(document).ready(function () {
       // Verificar si el usuario es vendedor
       $.get('../api/auth.php?accion=verificar', function(response) {
-        if (!response.autenticado || response.tipo !== 'vendedor') {
+        if (!response.autenticado || response.tipo !== 'repartidor') {
             window.location.href = '../auth/login.html';
         }
       });

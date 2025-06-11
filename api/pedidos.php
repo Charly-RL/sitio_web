@@ -197,18 +197,18 @@ switch ($metodo) {
             break;
         }
 
-        // Obtener pedidos en geneal (por defecto)
+        // Obtener pedidos solo del usuario autenticado (por defecto)
         $sql = "SELECT p.*, 
                 GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                 FROM pedidos p
                 JOIN detalles_pedido dp ON p.id = dp.pedido_id
                 JOIN productos pr ON dp.producto_id = pr.id
-                WHERE p.id = dp.pedido_id
+                WHERE p.usuario_id = ?
                 GROUP BY p.id
                 ORDER BY p.fecha_pedido DESC";
 
         $stmt = $conexion->prepare($sql);
-        //$stmt->bind_param("ii",$data[''] );
+        $stmt->bind_param('i', $usuario_id);
         $stmt->execute();
         $resultado = $stmt->get_result();
 

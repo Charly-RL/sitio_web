@@ -62,8 +62,8 @@ function esAdmin() {
     return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'admin';
 }
 
-// Función para verificar si el usuario es vendedor
-function esVendedor() {
+// Función para verificar si el usuario es repartidor
+function esRepartidor() {
     return isset($_SESSION['usuario_tipo']) && $_SESSION['usuario_tipo'] === 'repartidor';
 }
 

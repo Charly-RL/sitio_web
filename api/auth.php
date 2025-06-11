@@ -41,6 +41,7 @@ switch ($accion) {
         echo json_encode([
             'autenticado' => estaAutenticado(),
             'es_admin' => esAdmin(),
+            'es_repartidor' => esRepartidor(),
             'tipo' => isset($_SESSION['usuario_tipo']) ? $_SESSION['usuario_tipo'] : null
         ]);
         break;

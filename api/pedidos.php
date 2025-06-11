@@ -197,46 +197,6 @@ switch ($metodo) {
             break;
         }
 
-        // Endpoint para obtener detalles de productos de un pedido específico
-        if (isset($_GET['detalle']) && $_GET['detalle'] == 1 && isset($_GET['id'])) {
-            $pedido_id = intval($_GET['id']);
-            // Permitir solo si admin o el pedido pertenece al usuario
-            if (function_exists('esAdmin') && esAdmin()) {
-                $sql = "SELECT dp.cantidad, pr.nombre AS nombre_producto, dp.precio_unitario, dp.subtotal
-                        FROM detalles_pedido dp
-                        JOIN productos pr ON dp.producto_id = pr.id
-                        WHERE dp.pedido_id = ?";
-                $stmt = $conexion->prepare($sql);
-                $stmt->bind_param('i', $pedido_id);
-            } else {
-                // Verificar que el pedido pertenezca al usuario
-                $sql = "SELECT p.id FROM pedidos p WHERE p.id = ? AND p.usuario_id = ?";
-                $stmt = $conexion->prepare($sql);
-                $stmt->bind_param('ii', $pedido_id, $usuario_id);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if ($result->num_rows === 0) {
-                    http_response_code(403);
-                    echo json_encode(['error' => 'No autorizado']);
-                    exit;
-                }
-                $sql = "SELECT dp.cantidad, pr.nombre AS nombre_producto, dp.precio_unitario, dp.subtotal
-                        FROM detalles_pedido dp
-                        JOIN productos pr ON dp.producto_id = pr.id
-                        WHERE dp.pedido_id = ?";
-                $stmt = $conexion->prepare($sql);
-                $stmt->bind_param('i', $pedido_id);
-            }
-            $stmt->execute();
-            $resultado = $stmt->get_result();
-            $detalles = [];
-            while ($row = $resultado->fetch_assoc()) {
-                $detalles[] = $row;
-            }
-            echo json_encode(['detalles' => $detalles]);
-            break;
-        }
-
         // Obtener pedidos: admin ve todos, usuario solo los suyos
         if (function_exists('esAdmin') && esAdmin()) {
             $sql = "SELECT p.*, 

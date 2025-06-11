@@ -92,7 +92,8 @@
               <tr>
                 <td>#${pedido.id}</td>
                 <td>${pedido.usuario_id}</td>
-                <td>${new Date(pedido.fecha_pedido).toLocaleString()}</td>
+                <td>${pedido.fecha_pedido}</td>
+                <!-- <td>${new Date(pedido.fecha_pedido).toLocaleString()}</td>-->
                 <td>
                   <button class="btn btn-sm btn-outline-primary" 
                           onclick="verDetallesPedido(${pedido.id})">

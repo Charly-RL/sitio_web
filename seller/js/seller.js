@@ -4,7 +4,7 @@ $(document).ready(function() {
     $.get('../api/auth.php?accion=verificar', function(response) {
         if (!response.autenticado) {
             window.location.href = '../auth/login.html';
-        } else if (response.tipo !== 'vendedor') {
+        } else if (response.tipo !== 'repartidor') {
             // Si no es vendedor, redirigir según el tipo
             if (response.tipo === 'admin') {
                 window.location.href = '../admin/index.html';

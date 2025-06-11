@@ -65,7 +65,7 @@ switch ($metodo) {
         if (isset($data['tipo'])) {
             // Permitir solo valores válidos
             $tipo = $data['tipo'];
-            if (!in_array($tipo, ['admin', 'cliente', 'vendedor'])) {
+            if (!in_array($tipo, ['admin', 'cliente', 'repartidor'])) {
                 echo json_encode(['error' => 'Tipo de usuario no válido']);
                 exit;
             }

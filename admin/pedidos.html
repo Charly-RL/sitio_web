@@ -109,7 +109,7 @@
                 <td>${ajustarFecha(pedido.fecha_pedido)}</td>
                 <td>
                   <button class="btn btn-sm btn-outline-primary" 
-                          onclick="verDetallesPedido(${pedido.usuario_id})">
+                          onclick="verDetallesPedido(${pedido.id})">
                     Ver Productos
                   </button>
                 </td>
@@ -140,8 +140,8 @@
       }
 
       // Función para ver detalles del pedido
-      window.verDetallesPedido = function(usuario_id) {
-        $.post(`../api/verProd.php`,{usuario_id: usuario_id}, function(response) {
+      window.verDetallesPedido = function(id) {
+        $.post(`../api/verProd.php`,{id: id}, function(response) {
           let detalles = "";
           let total = 0;
 

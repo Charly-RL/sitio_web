@@ -15,18 +15,18 @@ if (!estaAutenticado()) {
 
 $conexion = conectarDB();
 
-$usuario_id = $_POST['usuario_id'];
+$id = $_POST['id'];
 
  $sql = "SELECT p.*, 
                     GROUP_CONCAT(CONCAT(dp.cantidad, 'x ', pr.nombre) SEPARATOR ', ') as productos
                     FROM pedidos p
                     JOIN detalles_pedido dp ON p.id = dp.pedido_id
                     JOIN productos pr ON dp.producto_id = pr.id
-                    WHERE p.usuario_id = ?
+                    WHERE p.id = ?
                     GROUP BY p.id
                     ORDER BY p.fecha_pedido DESC";
 $stmt = $conexion->prepare($sql);
-$stmt->bind_param('i', $usuario_id);
+$stmt->bind_param('i', $id);
 $result = $stmt->execute();
 
 if ($result) {

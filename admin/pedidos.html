@@ -144,18 +144,25 @@
 
       // Función para ver detalles del pedido
       window.verDetallesPedido = function(id) {
-        $.post(`../api/verProd.php`,{id: id}, function(response) {
+        $.get(`../api/pedidos.php?id=${id}`, function(response) {
           let detalles = "";
           let total = 0;
 
-          response.pedidos.forEach(item => {
-            detalles += `
-              <tr>
-                <td>${item.productos}</td>
-              </tr>
-            `;
-            total += parseFloat(item.subtotal);
-          });
+          if (response.detalles && response.detalles.length > 0) {
+            response.detalles.forEach(item => {
+              detalles += `
+                <tr>
+                  <td>${item.nombre_producto}</td>
+                  <td>${item.cantidad}</td>
+                  <td>$${item.precio_unitario}</td>
+                  <td>$${item.subtotal}</td>
+                </tr>
+              `;
+              total += parseFloat(item.subtotal);
+            });
+          } else {
+            detalles = '<tr><td colspan="4" class="text-center">No hay detalles para este pedido</td></tr>';
+          }
 
           const modalContent = `
             <div class="modal fade" id="detallesPedidoModal" tabindex="-1">
@@ -169,7 +176,10 @@
                     <table class="table">
                       <thead>
                         <tr>
-                          <th>Productos</th>
+                          <th>Producto</th>
+                          <th>Cantidad</th>
+                          <th>Precio Unitario</th>
+                          <th>Subtotal</th>
                         </tr>
                       </thead>
                       <tbody>

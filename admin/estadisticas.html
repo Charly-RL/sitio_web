@@ -105,14 +105,16 @@
         let labels = [], data = [];
 
         // Gráfica por día: muestra los últimos 7 días
-        if (tipo === 'dia' && estadisticas.ventas_por_dia) {
+        if (tipo === 'dia' && estadisticas.ventas_por_dia) {          
           let diasAMostrar = 7;
-          let hoy = new Date();
-          hoy = ajustarFecha(hoy); 
+          let hoy = ajustarFecha(new Date()); 
           hoy.setHours(0,0,0,0);
           let mapaVentas = {};
           // Crea un mapa de fecha a total vendido
-          estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));
+          estadisticas.ventas_por_dia.forEach(v => {
+            const fechaVenta = new Date(v.dia);
+            mapaVentas[v.dia] = Number(v.total);
+          });
           for (let i = diasAMostrar - 1; i >= 0; i--) {
             let fecha = new Date(hoy); fecha.setDate(hoy.getDate() - i);
             let yyyy = fecha.getFullYear(), mm = (fecha.getMonth() + 1).toString().padStart(2, '0'), dd = fecha.getDate().toString().padStart(2, '0');
@@ -120,10 +122,10 @@
             labels.push(diasSemana[fecha.getDay()] + ' ' + fecha.getDate());
             data.push(mapaVentas[fechaStr] || 0);
           }
-        // Gráfica por semana: muestra las últimas 8 semanas
+        // Gráfica por semana: muestra las últimas 8 semanas        
         } else if (tipo === 'semana' && estadisticas.ventas_por_semana) {
           labels = estadisticas.ventas_por_semana.map(v => {
-            const fecha = new Date(v.inicio_semana);
+            const fecha = ajustarFecha(new Date(v.inicio_semana));
             return 'Semana ' + v.semana + ' (' + fecha.toLocaleDateString('es-MX') + ')';
           });
           data = estadisticas.ventas_por_semana.map(v => Number(v.total));

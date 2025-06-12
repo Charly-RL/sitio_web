@@ -116,7 +116,7 @@
           let diasAMostrar = 7;
           let hoy = new Date();
           hoy = ajustarFecha(hoy); 
-          hoy.setHours(0,0,0,0);
+          //hoy.setHours(0,0,0,0);
           let mapaVentas = {};
           // Crea un mapa de fecha a total vendido
           estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));

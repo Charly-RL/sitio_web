@@ -109,7 +109,8 @@
                     productList.append(card);
                 });
             });
-        }        // Agregar al carrito
+        }        
+        // Agregar al carrito
         window.addToCart = function(id, nombre, precio) {
             if (!isAuthenticated) {
                 window.location.href = 'auth/login.html';
@@ -136,7 +137,8 @@
                     alert('Error al agregar al carrito');
                 }
             });
-        }        // Cargar carrito desde el servidor
+        }        
+        // Cargar carrito desde el servidor
         function loadCart() {
             $.get('api/carrito.php', function(response) {
                 const cartItems = response.carrito || [];
@@ -184,7 +186,8 @@
 
                 $('#cartTotal').text(total.toFixed(2));
             });
-        }        // Actualizar cantidad
+        }        
+        // Actualizar cantidad
         window.updateQuantity = function(id, newCantidad) {
             $.ajax({
                 url: 'api/carrito.php',
@@ -229,7 +232,8 @@
                     alert('Error al eliminar del carrito');
                 }
             });
-        }        // Realizar pedido
+        }        
+        // Realizar pedido
         $('#checkoutBtn').click(function() {
             if (!isAuthenticated) {
                 window.location.href = 'auth/login.html';

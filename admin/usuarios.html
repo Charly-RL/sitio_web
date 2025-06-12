@@ -64,6 +64,18 @@
             object-fit: cover;
         }
     </style>
+    <script>
+        $(document).ready(function() {
+            $('#logoutBtn').click(function() {
+                $.get('../api/auth.php?accion=logout', function(response) {
+                    if (response.success) {
+                        window.location.href = '../auth/login.html';
+                    }
+                });
+            });
+        });
+
+    </script>
 </head>
 <body>
     <!-- Navbar -->

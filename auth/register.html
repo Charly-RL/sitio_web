@@ -8,114 +8,73 @@
     <link rel="stylesheet" href="../CSS/bootstrap-icons.css">
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h3 class="card-title mb-4 text-center">Crear Cuenta</h3>
-                        <div id="successAlert" class="alert alert-success d-none"></div>
-                        <div id="errorAlert" class="alert alert-danger d-none"></div>
-                        <form id="registerForm">
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                <div class="invalid-feedback"><!-- valida formularios -->
-                                    El nombre debe tener al menos 3 caracteres
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                                <div class="invalid-feedback">
-                                    El correo no es valido
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                                <div class="invalid-feedback">
-                                    La contraseña debe tener al menos 6 caracteres                        
-                                </div>
-                            </div>
-                            <div class="mb-3 formcheck">
-                                <input type="checkbox" name="terminos" id="terminos" class="form-check-input">
-                                <label for="terminos" class="form-check-label">
-                                    Acepto los terminos y condiciones
-                                </label>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-                        </form>
-                        <div class="mt-3 text-center">
-                            <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-     <script src="../JS/jquery-3.7.1.min.js"></script>
+    <script src="../JS/jquery-3.7.1.min.js"></script>
     <script src="../JS/bootstrap.bundle.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#registerForm').submit(function(e) {
-            e.preventDefault();
-            let validado = true;
-                //validar el nombre
-                let nombre = $("#nombre").val();
-                if(nombre.length < 3){
-                    $("#nombre").addClass("is-invalid");
+        $(document).ready(function () {
+            $('#registerForm').submit(function (e) {
+                e.preventDefault();
+                let validado = true;
+
+                // Validar nombre
+                const nombre = $('#nombre').val();
+                if (nombre.length < 3) {
+                    $('#nombre').addClass('is-invalid');
                     validado = false;
-                }else{
-                    $("#nombre").removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $('#nombre').removeClass('is-invalid').addClass('is-valid');
                 }
-                //validar el correo
-                let email = $("#email").val();
-                //expresion regular para validar el correo,los que esta en corchetes hace que por lo menos exista un caracter
-                let correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if(!correoRegex.test(email)){
-                    $("#email").addClass("is-invalid");
+
+                // Validar email
+                const email = $('#email').val();
+                const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!correoRegex.test(email)) {
+                    $('#email').addClass('is-invalid');
                     validado = false;
-                }else{
-                    $("#email").removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $('#email').removeClass('is-invalid').addClass('is-valid');
                 }
-                let password = $("#password").val();
-                if(password.length < 6){
-                    $("#password").addClass("is-invalid");
+
+                // Validar contraseña
+                const password = $('#password').val();
+                if (password.length < 6) {
+                    $('#password').addClass('is-invalid');
                     validado = false;
-                }else{
-                    $("#password").removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $('#password').removeClass('is-invalid').addClass('is-valid');
                 }
-                //validar terminos
-                if(!$("#terminos").is(":checked")){
-                    $("#terminos").addClass("is-invalid");
+
+                // Validar términos
+                if (!$('#terminos').is(':checked')) {
+                    $('#terminos').addClass('is-invalid');
                     validado = false;
-                }else{
-                    $("#terminos").removeClass("is-invalid").addClass("is-valid");
+                } else {
+                    $('#terminos').removeClass('is-invalid').addClass('is-valid');
                 }
-                //quitar el mensaje cuando a inicies a escribir
-                $("input").keypress(function(){
-                    $(this).removeClass("is-invalid is-valid")
-                });
-                $("#terminos").change(function(){
-                    $(this).removeClass("is-invalid is-valid");
+
+                // Eliminar mensajes al escribir
+                $('input').keypress(function () {
+                    $(this).removeClass('is-invalid is-valid');
                 });
 
-                //si todos los campos son validos se envia el formulario
-                if(validado){
-                    //alert("Formulario enviado");
-                    //this.submit();
+                $('#terminos').change(function () {
+                    $(this).removeClass('is-invalid is-valid');
+                });
+
+                // Enviar formulario si todo está válido
+                if (validado) {
                     const data = {
                         nombre: $('#nombre').val(),
                         email: $('#email').val(),
                         password: $('#password').val()
                     };
+
                     $.ajax({
                         url: '../api/auth.php?accion=registro',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(data),
-                        success: function(response) {
+                        success: function (response) {
                             if (response.error) {
                                 $('#errorAlert').text(response.error).removeClass('d-none');
                                 $('#successAlert').addClass('d-none');
@@ -124,20 +83,73 @@
                                 $('#errorAlert').addClass('d-none');
                                 $('#registerForm')[0].reset();
                                 setTimeout(() => {
-                                        window.location.href = 'login.html';
-                                    }, 1500);
-                                }
-                            },
-                            error: function() {
-                                $('#errorAlert').text('Error en la conexión').removeClass('d-none');
-                                $('#successAlert').addClass('d-none');
+                                    window.location.href = 'login.html';
+                                }, 1500);
                             }
+                        },
+                        error: function () {
+                            $('#errorAlert').text('Error en la conexión').removeClass('d-none');
+                            $('#successAlert').addClass('d-none');
+                        }
                     });
-                   
                 }
             });
         });
-            
     </script>
+
+    <!-- Contenido principal -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4 text-center">Crear Cuenta</h3>
+
+                        <div id="successAlert" class="alert alert-success d-none"></div>
+                        <div id="errorAlert" class="alert alert-danger d-none"></div>
+
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <div class="invalid-feedback">
+                                    El nombre debe tener al menos 3 caracteres
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">
+                                    El correo no es válido
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">
+                                    La contraseña debe tener al menos 6 caracteres
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="terminos" id="terminos" class="form-check-input">
+                                <label for="terminos" class="form-check-label">
+                                    Acepto los términos y condiciones
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                        </form>
+
+                        <div class="mt-3 text-center">
+                            <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

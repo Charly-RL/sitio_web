@@ -87,17 +87,10 @@
     $(function () {
       // Ajusta la fecha a la zona horaria correcta
       function ajustarFecha(fecha) {
-        const date = new Date(fecha);
-        date.setHours(date.getHours() - 7);
-        return date.toLocaleString('es-MX', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        });
-      }
+          const date = new Date(fecha);
+          date.setHours(date.getHours() - 7);
+          return date;
+        }
 
       // Variables globales para almacenar datos y la instancia de la gráfica
       let estadisticas = null;

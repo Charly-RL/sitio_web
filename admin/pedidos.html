@@ -62,11 +62,10 @@
   <!-- scripts personalizados -->
   <script>
     $(document).ready(function () {
-      // Función para ajustar la zona horaria (restar 6 horas)
-      // Ajusta la fecha a la zona horaria correcta (resta 6 horas)
+      // Función para ajustar la zona horaria
       function ajustarFecha(fecha) {
         const date = new Date(fecha);
-        date.setHours(date.getHours() - 6);
+        date.setHours(date.getHours() - 7);
         return date.toLocaleString('es-MX', {
           year: 'numeric',
           month: '2-digit',

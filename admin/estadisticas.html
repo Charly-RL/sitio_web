@@ -88,7 +88,7 @@
       // Ajusta la fecha a la zona horaria correcta
       function ajustarFecha(fecha) {
         const date = new Date(fecha);
-        date.setHours(date.getHours() - 6);
+        date.setHours(date.getHours() - 7);
         return date.toLocaleString('es-MX', {
           year: 'numeric',
           month: '2-digit',
@@ -114,7 +114,9 @@
         // Gráfica por día: muestra los últimos 7 días
         if (tipo === 'dia' && estadisticas.ventas_por_dia) {
           let diasAMostrar = 7;
-          let hoy = new Date(); hoy.setHours(0,0,0,0);
+          let hoy = new Date();
+          hoy = ajustarFecha(hoy); 
+          hoy.setHours(0,0,0,0);
           let mapaVentas = {};
           // Crea un mapa de fecha a total vendido
           estadisticas.ventas_por_dia.forEach(v => mapaVentas[v.dia] = Number(v.total));

@@ -31,6 +31,12 @@
             justify-content: center;
             font-weight: bold;
         }
+        .logo{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
     <script>
         $(document).ready(function() {
@@ -192,7 +198,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Botanas Kiky</a>
+            <a class="navbar-brand" href="index.html">
+                <img src="img/fondo1.jpg" class="logo">
+                Botanas Kiky
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -200,6 +209,9 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="index.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="checkout.html">Finalizar Compra</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

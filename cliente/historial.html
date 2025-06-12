@@ -42,6 +42,9 @@
                 if (!response.autenticado) {
                     window.location.href = '../auth/login.html';
                 }
+                NombreUsuario = response.nombre || '';
+                localStorage.setItem('userName', NombreUsuario);
+                $('#userName').text(NombreUsuario);
             });
 
             // Cargar pedidos
@@ -147,7 +150,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="../index.html">Botanas Kiky</a>
+            <a class="navbar-brand" href="index.html">
+                <img src="img/fondo1.jpg" class="logo">
+                Botanas Kiky
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -161,7 +167,7 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item" id="userMenu" style="display: none;">
+                    <li class="nav-item" id="userMenu">
                         <div class="dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle"></i>

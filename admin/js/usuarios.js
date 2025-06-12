@@ -104,6 +104,16 @@ $(document).ready(function() {
         });
     });
 
+    // Cierra la sesión del usuario administrador
+    $('#logoutBtn').click(function() {
+        $.get('../api/auth.php?accion=logout', function(response) {
+            if (response.success) {
+                window.location.href = '../auth/login.html';
+            }
+        });
+    });
+
+
 
     // Inicializa la carga de usuarios al abrir la página
     loadUsuarios();

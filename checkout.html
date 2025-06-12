@@ -41,8 +41,11 @@
                 }
                 NombreUsuario = response.nombre || '';
                 localStorage.setItem('userName', NombreUsuario);
+                $('#userName').text(NombreUsuario);
+            
             });
-
+            
+            
             let direccionSeleccionada = null;
 
             // Cargar direcciones del usuario

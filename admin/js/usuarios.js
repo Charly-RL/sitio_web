@@ -105,7 +105,7 @@ $(document).ready(function() {
     });
 
     // Cierra la sesión del usuario administrador
-    $('#logoutBtn').click(function() {
+    $('#logoutBtn').on('click',function() {
         $.get('../api/auth.php?accion=logout', function(response) {
             if (response.success) {
                 window.location.href = '../auth/login.html';

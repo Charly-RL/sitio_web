@@ -65,19 +65,19 @@
                 $('#userName').text(localStorage.getItem('userName'));
                 if (isAdmin) {
                     $('#adminMenuItem').show();
-                    $('#panelVendedor').hide();
+                    $('#panelRepartidor').hide();
                 } else if (isRepartidor) {
-                    $('#panelVendedor').show();
+                    $('#panelRepartidor').show();
                     $('#adminMenuItem').hide();
                 } else {
                     $('#adminMenuItem').hide();
-                    $('#panelVendedor').hide();
+                    $('#panelRepartidor').hide();
                 }
             } else {
                 $('#authButtons').show();
                 $('#userMenu').hide();
                 $('#adminMenuItem').hide();
-                $('#panelVendedor').hide();
+                $('#panelRepartidor').hide();
             }
         }
 
@@ -326,7 +326,7 @@
                     <li class="nav-item" id="adminMenuItem" style="display: none;">
                         <a class="nav-link" href="admin/index.html">Panel Admin</a>
                     </li>
-                    <li class="nav-item" id="panelVendedor" style="display: none;">
+                    <li class="nav-item" id="panelRepartidor" style="display: none;">
                         <a class="nav-link" href="seller/index.html">Panel Repartidor</a>
                     </li>
                     <li class="nav-item">

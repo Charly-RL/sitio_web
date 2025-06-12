@@ -194,9 +194,9 @@ switch ($metodo) {
             $total_ventas = (float)$row['total_ventas'];
 
             // Ventas por día (últimos 7 días)
-            $sql = "SELECT DATE(fecha_pedido) as dia, IFNULL(SUM(total),0) as total
+            $sql = "SELECT DATE(CONVERT_TZ(fecha_pedido, '+00:00', '-07:00')) as dia, IFNULL(SUM(total),0) as total
                     FROM pedidos
-                    WHERE fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                    WHERE fecha_pedido >= DATE_SUB(CONVERT_TZ(NOW(), '+00:00', '-07:00'), INTERVAL 6 DAY)
                     GROUP BY dia
                     ORDER BY dia ASC";
             $result = $conexion->query($sql);

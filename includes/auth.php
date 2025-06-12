@@ -55,7 +55,6 @@ function login($email, $password) {
 // Función para verificar si el usuario está autenticado
 function estaAutenticado() {
     return isset($_SESSION['usuario_id']);
-    echo json_encode(['usuario' => $usuario]);
 }
 
 // Función para verificar si el usuario es administrador

@@ -224,12 +224,33 @@ switch ($metodo) {
                 ];
             }
 
+            // Ventas por mes (últimos 12 meses)
+            $sql = "SELECT 
+                    YEAR(CONVERT_TZ(fecha_pedido, '+00:00', '-07:00')) as anio,
+                    MONTH(CONVERT_TZ(fecha_pedido, '+00:00', '-07:00')) as mes,
+                    IFNULL(SUM(total), 0) as total
+                    FROM pedidos
+                    WHERE fecha_pedido >= DATE_SUB(CONVERT_TZ(NOW(), '+00:00', '-07:00'), INTERVAL 12 MONTH)
+                    GROUP BY anio, mes
+                    ORDER BY anio ASC, mes ASC";
+
+            $result = $conexion->query($sql);
+            $ventas_por_mes = [];
+            while ($row = $result->fetch_assoc()) {
+                $ventas_por_mes[] = [
+                    'anio' => $row['anio'],
+                    'mes' => $row['mes'],
+                    'total' => $row['total']
+                ];
+            }
+
             echo json_encode([
                 'success' => true,
                 'total_pedidos' => $total_pedidos,
                 'total_ventas' => $total_ventas,
                 'ventas_por_dia' => $ventas_por_dia,
-                'ventas_por_semana' => $ventas_por_semana
+                'ventas_por_semana' => $ventas_por_semana,
+                'ventas_por_mes' => $ventas_por_mes
             ]);
             break;
         }

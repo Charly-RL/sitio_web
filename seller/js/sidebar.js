@@ -7,7 +7,7 @@ function loadSidebarSeller(activePage) {
     </div>
     <ul class="nav flex-column p-3">
         <li class="nav-item mb-2">
-            <a class="nav-link text-white${activePage==='index' ? ' active' : ''}" href="index.html"><i class="bi bi-box-seam me-2"></i>Mis Productos</a>
+            <a class="nav-link text-white${activePage==='index' ? ' active' : ''}" href="index.html"><i class="bi bi-box-seam me-2"></i>Pedidos</a>
         </li>
         <li class="nav-item mb-2">
             <a class="nav-link text-white${activePage==='estadisticas' ? ' active' : ''}" href="estadisticas.html"><i class="bi bi-bar-chart me-2"></i>Estadísticas</a>

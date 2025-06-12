@@ -66,7 +66,7 @@
         }
   </style>
   <script>
-    // Lógica para mostrar/ocultar la barra lateral (sidebar) en dispositivos móviles
+    // Lógica para mostrar y ocultar la barra lateral 
     document.addEventListener('DOMContentLoaded', function () {
       const sidebar = document.getElementById('adminSidebar');
       const sidebarToggle = document.getElementById('sidebarToggle');
@@ -85,7 +85,7 @@
     });
 
     $(function () {
-      // Ajusta la fecha a la zona horaria correcta (resta 6 horas)
+      // Ajusta la fecha a la zona horaria correcta
       function ajustarFecha(fecha) {
         const date = new Date(fecha);
         date.setHours(date.getHours() - 6);

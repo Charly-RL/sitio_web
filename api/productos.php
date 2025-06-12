@@ -1,29 +1,33 @@
 <?php
+// API para gestión de productos
+// Permite: obtener, crear, editar y eliminar productos
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
+require_once __DIR__ . '/../config/db.php'; // Conexión a la base de datos
+require_once __DIR__ . '/../includes/auth.php'; // Funciones de autenticación
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../includes/auth.php';
-
-// Obtener conexión
+// Obtener conexión a la base de datos
 $conexion = conectarDB();
 
-// Obtener método de la solicitud
+// Obtener método de la solicitud HTTP
 $metodo = $_SERVER['REQUEST_METHOD'];
 
-// Obtener datos de la solicitud
+// Obtener datos enviados en la solicitud (para POST y PUT)
 $data = json_decode(file_get_contents('php://input'), true);
 
 switch ($metodo) {
     case 'GET':
         // Obtener un producto específico o todos los productos
         if (isset($_GET['id'])) {
+            // Si se pasa un ID, obtener solo ese producto
             $id = $conexion->real_escape_string($_GET['id']);
             $sql = "SELECT * FROM productos WHERE id = $id";
         } else {
+            // Si no, obtener todos los productos
             $sql = "SELECT * FROM productos";
         }
 
@@ -31,7 +35,7 @@ switch ($metodo) {
         $productos = [];
 
         while ($row = $resultado->fetch_assoc()) {
-            // Calcular estado de stock
+            // Calcular estado de stock para cada producto
             $stock = (int)$row['stock'];
             if ($stock <= 2) {
                 $row['stock_estado'] = 'Crítico';
@@ -45,6 +49,7 @@ switch ($metodo) {
             $productos[] = $row;
         }
 
+        // Respuesta con la lista de productos
         echo json_encode(['productos' => $productos]);
         break;
         
@@ -55,13 +60,13 @@ switch ($metodo) {
             exit;
         }
         
-        // Validar datos requeridos
+        // Validar datos requeridos para crear producto
         if (!isset($data['nombre']) || !isset($data['precio']) || !isset($data['stock'])) {
             echo json_encode(['error' => 'Faltan datos requeridos']);
             exit;
         }
         
-        // Preparar la consulta
+        // Preparar la consulta de inserción
         $stmt = $conexion->prepare("INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("ssdis", 
             $data['nombre'],
@@ -129,6 +134,7 @@ switch ($metodo) {
             exit;
         }
         
+        // Preparar y ejecutar la actualización
         $sql = "UPDATE productos SET " . implode(', ', $campos) . " WHERE id = ?";
         $tipos .= 'i';
         $valores[] = $id;
@@ -157,7 +163,7 @@ switch ($metodo) {
         
         $id = $conexion->real_escape_string($_GET['id']);
         
-        // Verificar si el producto existe y eliminar
+        // Eliminar el producto por ID
         $stmt = $conexion->prepare("DELETE FROM productos WHERE id = ?");
         $stmt->bind_param("i", $id);
         
@@ -173,8 +179,10 @@ switch ($metodo) {
         break;
     
     default:
+        // Método HTTP no permitido
         echo json_encode(['error' => 'Método no permitido']);
         break;
 }
 
+// Cerrar la conexión a la base de datos
 $conexion->close();

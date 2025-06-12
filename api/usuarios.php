@@ -1,11 +1,14 @@
 <?php
+// API para gestión de usuarios
+// Permite: obtener, editar y eliminar usuarios
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../config/db.php'; // Conexión a la base de datos
+require_once __DIR__ . '/../includes/auth.php'; // Funciones de autenticación
 
 $conexion = conectarDB();
 $metodo = $_SERVER['REQUEST_METHOD'];
@@ -15,9 +18,11 @@ switch ($metodo) {
     case 'GET':
         // Obtener todos los usuarios o uno específico
         if (isset($_GET['id'])) {
+            // Si se pasa un ID, obtener solo ese usuario
             $id = $conexion->real_escape_string($_GET['id']);
             $sql = "SELECT id, nombre, email, tipo, fecha_registro FROM usuarios WHERE id = $id";
         } else {
+            // Si no, obtener todos los usuarios
             $sql = "SELECT id, nombre, email, tipo, fecha_registro FROM usuarios";
         }
         $resultado = $conexion->query($sql);
@@ -25,10 +30,11 @@ switch ($metodo) {
         while ($row = $resultado->fetch_assoc()) {
             $usuarios[] = $row;
         }
+        // Respuesta con la lista de usuarios
         echo json_encode(['usuarios' => $usuarios]);
         break;
     case 'PUT':
-        // Solo admin puede editar
+        // Solo admin puede editar usuarios
         if (!esAdmin()) {
             echo json_encode(['error' => 'No autorizado']);
             exit;
@@ -49,6 +55,7 @@ switch ($metodo) {
             break;
         }
 
+        // Construir campos a actualizar
         $campos = [];
         $tipos = '';
         $valores = [];
@@ -63,7 +70,7 @@ switch ($metodo) {
             $valores[] = $data['email'];
         }
         if (isset($data['tipo'])) {
-            // Permitir solo valores válidos
+            // Permitir solo valores válidos para el tipo de usuario
             $tipo = $data['tipo'];
             if (!in_array($tipo, ['admin', 'cliente', 'repartidor'])) {
                 echo json_encode(['error' => 'Tipo de usuario no válido']);
@@ -77,6 +84,7 @@ switch ($metodo) {
             echo json_encode(['error' => 'No hay datos para actualizar']);
             exit;
         }
+        // Preparar y ejecutar la actualización
         $sql = "UPDATE usuarios SET " . implode(', ', $campos) . " WHERE id = ?";
         $tipos .= 'i';
         $valores[] = $id;
@@ -89,9 +97,8 @@ switch ($metodo) {
         }
         break;
 
-        
     case 'DELETE':
-        // Solo admin puede eliminar
+        // Solo admin puede eliminar usuarios
         if (!esAdmin()) {
             echo json_encode(['error' => 'No autorizado']);
             exit;
@@ -133,6 +140,7 @@ switch ($metodo) {
         }
         break;
     default:
+        // Método HTTP no permitido
         echo json_encode(['error' => 'Método no permitido']);
         break;
 }

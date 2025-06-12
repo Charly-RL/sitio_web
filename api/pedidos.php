@@ -209,9 +209,9 @@ switch ($metodo) {
             }
 
             // Ventas por semana (últimas 4 semanas)
-            $sql = "SELECT YEARWEEK(fecha_pedido, 1) as semana, MIN(DATE(fecha_pedido)) as inicio_semana, IFNULL(SUM(total),0) as total
+            $sql = "SELECT YEARWEEK(CONVERT_TZ(fecha_pedido, '+00:00', '-07:00'), 1) as semana, MIN(DATE(CONVERT_TZ(fecha_pedido, '+00:00', '-07:00'))) as inicio_semana, IFNULL(SUM(total),0) as total
                     FROM pedidos
-                    WHERE fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
+                    WHERE fecha_pedido >= DATE_SUB(CONVERT_TZ(NOW(), '+00:00', '-07:00'), INTERVAL 28 DAY)
                     GROUP BY semana
                     ORDER BY semana ASC";
             $result = $conexion->query($sql);

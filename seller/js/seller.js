@@ -1,6 +1,6 @@
 // seller.js - Lógica JS para el panel de vendedor
 $(document).ready(function() {
-    // Verificar si el usuario está autenticado y es vendedor
+    // Verificar si el usuario está autenticado y es repartidor
     $.get('../api/auth.php?accion=verificar', function(response) {
         if (!response.autenticado) {
             window.location.href = '../auth/login.html';

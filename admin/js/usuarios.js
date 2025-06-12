@@ -112,9 +112,6 @@ $(document).ready(function() {
             }
         });
     });
-
-
-
     // Inicializa la carga de usuarios al abrir la página
     loadUsuarios();
 });

@@ -50,10 +50,13 @@
                 isAuthenticated = response.autenticado;
                 isAdmin = response.es_admin;
                 isRepartidor = response.tipo === 'repartidor';
+                NombreUsuario = response.nombre || '';
+                localStorage.setItem('userName', NombreUsuario);
                 updateAuthUI();
             });
+            
         }
-
+        
         // Actualizar UI según autenticación y tipo
         function updateAuthUI() {
             if (isAuthenticated) {

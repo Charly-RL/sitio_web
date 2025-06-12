@@ -52,7 +52,8 @@ switch ($accion) {
             'autenticado' => estaAutenticado(), // true si hay sesión activa
             'es_admin' => esAdmin(),            // true si es administrador
             'es_repartidor' => esRepartidor(),  // true si es repartidor
-            'tipo' => isset($_SESSION['usuario_tipo']) ? $_SESSION['usuario_tipo'] : null // tipo textual
+            'tipo' => isset($_SESSION['usuario_tipo']) ? $_SESSION['usuario_tipo'] : null,
+            'nombre' => $_SESSION['usuario_nombre'] // tipo textual
         ]);
         break;
 

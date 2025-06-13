@@ -83,9 +83,9 @@ switch ($metodo) {
                 $stmt->execute();
 
                 // Actualizar stock
-                $stmt = $conexion->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?");
+                /*$stmt = $conexion->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?");
                 $stmt->bind_param("ii", $producto['cantidad'], $producto['producto_id']);
-                $stmt->execute();
+                $stmt->execute();*/
             }
 
             // Limpiar carrito

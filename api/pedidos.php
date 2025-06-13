@@ -59,9 +59,7 @@ switch ($metodo) {
             $total = 0;
 
             while ($item = $result->fetch_assoc()) {
-                if ($item['stock'] < $item['cantidad']) {
-                    throw new Exception("Stock insuficiente para " . $item['nombre']);
-                }
+                
                 $subtotal = $item['precio'] * $item['cantidad'];
                 $total += $subtotal;
                 $productos[] = $item;
